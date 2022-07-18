@@ -1,1 +1,1 @@
-# dune-prometheus
+# dune-alerts
