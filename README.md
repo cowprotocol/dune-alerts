@@ -47,3 +47,13 @@ where `QUERY_CONFIG_PATH` is a filepath to the yaml file containing your query c
 
 This will load the query details, refresh the query with given parameters, fetch the results and send an alert to the
 configured Slack channel if warranted.
+
+
+## Run with Docker
+
+From the root of this project, assuming you have a .env file with dune and slack credentials and a query configuration `config.yaml` 
+```shell
+# build
+docker build -t slackbot .
+docker run -v ${PWD}/config.yaml:/app/config.yaml --env-file .env slackbot --query-config config.yaml
+```
