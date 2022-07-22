@@ -1,0 +1,18 @@
+name: With Parameters
+id: 123
+parameters:
+  - key: NumberParam
+    type: number
+    value: 1337.0
+  - key: TextParam
+    type: text
+    value: word
+  - key: DateParam
+    type: date
+    value: 1985-03-10
+  - key: EnumParam
+    type: enum
+    value: option1
+    enumOptions:
+      - option1
+      - option2
