@@ -2,3 +2,9 @@ black==22.6.0
 pylint==2.14.5
 pytest==7.1.2
 mypy==0.971
+duneapi==3.1.1
+python-dotenv==0.20.0
+slackclient==2.9.4
+certifi==2022.6.15
+PyYAML==6.0
+types-PyYAML==6.0.10

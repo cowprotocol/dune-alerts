@@ -1,0 +1,5 @@
+name: Windowed Query Example
+id: 1
+window:
+    offset: 2
+    length: 1
