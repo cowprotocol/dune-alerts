@@ -18,6 +18,7 @@ if __name__ == "__main__":
         "--query-config",
         type=str,
         help="YAML configuration file for a QueryMonitor object",
+        required=True,
     )
     args = parser.parse_args()
 
