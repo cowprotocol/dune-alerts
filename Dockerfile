@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY requirements/* requirements/
 RUN pip install -r requirements/prod.txt
-
-COPY . .
+COPY ./src ./src
+COPY logging.conf .
 
 ENTRYPOINT [ "python3", "-m" , "src.slackbot"]
