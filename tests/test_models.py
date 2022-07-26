@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from duneapi.types import QueryParameter
 
-from src.models import TimeWindow
+from src.models import TimeWindow, LeftBound, TimeUnit
 
 
 class TestTimeWindow(unittest.TestCase):
@@ -46,6 +46,47 @@ class TestTimeWindow(unittest.TestCase):
                 QueryParameter.date_type(
                     name="EndTime", value=self.start + timedelta(hours=window.length)
                 ),
+            ],
+        )
+
+
+class TestLeftBound(unittest.TestCase):
+    def setUp(self) -> None:
+        self.left_bound = LeftBound(TimeUnit("minutes"), 1)
+
+    def test_constructor(self):
+        self.assertEqual(self.left_bound.units, TimeUnit.MINUTES)
+        self.assertEqual(self.left_bound.offset, 1)
+
+    def test_from_cfg(self):
+        print(self.left_bound.__dict__)
+        from_cfg = LeftBound.from_cfg(
+            {
+                "offset": 1,
+                "units": TimeUnit.MINUTES,
+            }
+        )
+        print(from_cfg.__dict__)
+        self.assertEqual(
+            LeftBound.from_cfg(
+                {
+                    "offset": 1,
+                    "units": TimeUnit.MINUTES,
+                }
+            ),
+            self.left_bound,
+        )
+
+    def test_as_query_params(self):
+        self.assertEqual(
+            self.left_bound.as_query_parameters(),
+            [
+                QueryParameter.enum_type(
+                    name="TimeUnits",
+                    value=TimeUnit.MINUTES.value,
+                    options=TimeUnit.options(),
+                ),
+                QueryParameter.number_type(name="Offset", value=1),
             ],
         )
 

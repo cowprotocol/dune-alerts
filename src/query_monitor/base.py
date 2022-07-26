@@ -81,3 +81,7 @@ class BaseQueryMonitor(ABC):
             )
         else:
             log.info(f"No {self.name} detected")
+
+
+class QueryMonitor(BaseQueryMonitor):
+    """This is essentially the base query monitor with all default methods"""

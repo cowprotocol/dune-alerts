@@ -1,14 +1,11 @@
 """
-All implementations of the base QueryMonitor class
+Implementation of BaseQueryMonitor for "windowed" queries having StartTime and EndTime
 """
-from __future__ import annotations
-
 import logging.config
 import urllib.parse
 from datetime import datetime, timedelta
 from typing import Optional
 
-import yaml
 from duneapi.api import DuneAPI
 from duneapi.types import QueryParameter
 from slack.web.client import WebClient
@@ -18,27 +15,6 @@ from src.query_monitor.base import BaseQueryMonitor
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
-
-
-def load_from_config(config_yaml: str) -> BaseQueryMonitor:
-    """Loads a QueryMonitor object from yaml configuration file"""
-    with open(config_yaml, "r", encoding="utf-8") as yaml_file:
-        cfg = yaml.load(yaml_file, yaml.Loader)
-
-    name, query_id = cfg["name"], cfg["id"]
-    threshold = cfg.get("threshold", 0)
-    params = [
-        QueryParameter.from_dict(param_cfg) for param_cfg in cfg.get("parameters", [])
-    ]
-    try:
-        window = TimeWindow.from_cfg(cfg["window"])
-        return WindowedQueryMonitor(name, query_id, window, params, threshold)
-    except KeyError:
-        return QueryMonitor(name, query_id, params, threshold)
-
-
-class QueryMonitor(BaseQueryMonitor):
-    """This is essentially the base query monitor with all default methods"""
 
 
 class WindowedQueryMonitor(BaseQueryMonitor):

@@ -4,11 +4,10 @@ import unittest
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
-from src.query_monitor.implementations import (
-    load_from_config,
-    QueryMonitor,
-    WindowedQueryMonitor,
-)
+from src.query_monitor.base import QueryMonitor
+from src.query_monitor.factory import load_from_config
+from src.query_monitor.windowed import WindowedQueryMonitor
+from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 
 
 class TestQueryMonitor(unittest.TestCase):
@@ -58,7 +57,7 @@ class TestQueryMonitor(unittest.TestCase):
         )
 
 
-class TestLoadConfig(unittest.TestCase):
+class TestFactory(unittest.TestCase):
     def test_load_from_config(self):
         no_params_monitor = load_from_config("./tests/data/no-params.yaml")
         self.assertTrue(isinstance(no_params_monitor, QueryMonitor))
@@ -70,6 +69,9 @@ class TestLoadConfig(unittest.TestCase):
 
         windowed_monitor = load_from_config("./tests/data/windowed-query.yaml")
         self.assertTrue(isinstance(windowed_monitor, WindowedQueryMonitor))
+
+        left_bounded_monitor = load_from_config("./tests/data/left-bounded.yaml")
+        self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
 
 
 if __name__ == "__main__":
