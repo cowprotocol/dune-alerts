@@ -25,7 +25,6 @@ class WindowedQueryMonitor(BaseQueryMonitor):
 
     window: TimeWindow
 
-    # pylint:disable=too-many-arguments
     def __init__(
         self,
         name: str,
@@ -37,7 +36,6 @@ class WindowedQueryMonitor(BaseQueryMonitor):
         super().__init__(name, query_id, params, threshold)
         self._set_window(window)
 
-    # pylint:enable=too-many-arguments
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with window parameters appended"""
         return self.fixed_params + self.window.as_query_parameters()
