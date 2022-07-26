@@ -10,7 +10,7 @@ import dotenv
 from duneapi.api import DuneAPI
 from slack.web.client import WebClient
 
-from src.query_monitor.implementations import load_from_config
+from src.query_monitor.factory import load_from_config
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Missing Tokens")
