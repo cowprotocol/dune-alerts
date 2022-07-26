@@ -59,14 +59,12 @@ class TestLeftBound(unittest.TestCase):
         self.assertEqual(self.left_bound.offset, 1)
 
     def test_from_cfg(self):
-        print(self.left_bound.__dict__)
         from_cfg = LeftBound.from_cfg(
             {
                 "offset": 1,
                 "units": TimeUnit.MINUTES,
             }
         )
-        print(from_cfg.__dict__)
         self.assertEqual(
             LeftBound.from_cfg(
                 {
