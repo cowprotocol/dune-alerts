@@ -23,11 +23,17 @@ class BaseQueryMonitor(ABC):
     """
 
     def __init__(
-        self, name: str, query_id: int, params: Optional[list[QueryParameter]] = None
+        self,
+        name: str,
+        query_id: int,
+        params: Optional[list[QueryParameter]] = None,
+        threshold: int = 0,
     ):
         self.query_id = query_id
         self.fixed_params = params if params else []
         self.name = name
+        # Threshold for alert worthy number of results.
+        self.threshold = threshold
 
     def result_url(self) -> str:
         """Returns a link to query results excluding fixed parameters"""
@@ -64,7 +70,7 @@ class BaseQueryMonitor(ABC):
         """
         log.info(f'Refreshing "{self.name}" query {self.query_id}')
         results = self.refresh(dune)
-        if results:
+        if len(results) > self.threshold:
             log.error(self.alert_message(len(results)))
             slack_client.chat_postMessage(
                 channel=alert_channel,

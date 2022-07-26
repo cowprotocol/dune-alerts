@@ -26,14 +26,15 @@ def load_from_config(config_yaml: str) -> BaseQueryMonitor:
         cfg = yaml.load(yaml_file, yaml.Loader)
 
     name, query_id = cfg["name"], cfg["id"]
+    threshold = cfg.get("threshold", 0)
     params = [
         QueryParameter.from_dict(param_cfg) for param_cfg in cfg.get("parameters", [])
     ]
     try:
         window = TimeWindow.from_cfg(cfg["window"])
-        return WindowedQueryMonitor(name, query_id, window, params)
+        return WindowedQueryMonitor(name, query_id, window, params, threshold)
     except KeyError:
-        return QueryMonitor(name, query_id, params)
+        return QueryMonitor(name, query_id, params, threshold)
 
 
 class QueryMonitor(BaseQueryMonitor):
@@ -48,16 +49,19 @@ class WindowedQueryMonitor(BaseQueryMonitor):
 
     window: TimeWindow
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self,
         name: str,
         query_id: int,
         window: TimeWindow,
         params: Optional[list[QueryParameter]] = None,
+        threshold: int = 0,
     ):
-        super().__init__(name, query_id, params)
+        super().__init__(name, query_id, params, threshold)
         self._set_window(window)
 
+    # pylint:enable=too-many-arguments
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with window parameters appended"""
         return self.fixed_params + self.window.as_query_parameters()
