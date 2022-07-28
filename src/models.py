@@ -3,7 +3,7 @@ Some generic models used throughout the project
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from enum import Enum
 
 from duneapi.types import QueryParameter
@@ -18,11 +18,26 @@ class TimeWindow:
         self.length = length_hours
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, int]) -> TimeWindow:
-        """Loads TimeWindow based on current time length and offset (both in hours)"""
+    def from_cfg(cls, cfg: dict[str, int] | str) -> TimeWindow:
+        """
+        Loads TimeWindow based on current time and either one of two configurations
+         1. `length` of time window and `offset` (both in hours)
+         2. `yesterday` returning a full date interval
+        """
+        if isinstance(cfg, dict):
+            return cls(
+                start=datetime.now() - timedelta(hours=cfg["offset"]),
+                length_hours=cfg["length"],
+            )
+        assert cfg == "yesterday"
+        return TimeWindow.for_day(date.today() - timedelta(days=1))
+
+    @classmethod
+    def for_day(cls, day: date):
         return cls(
-            start=datetime.now() - timedelta(hours=cfg["offset"]),
-            length_hours=cfg["length"],
+            # this is datetime object from date
+            start=datetime.combine(day, datetime.min.time()),
+            length_hours=24
         )
 
     def as_query_parameters(self) -> list[QueryParameter]:
