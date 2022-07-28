@@ -41,6 +41,13 @@ class TestTimeWindow(unittest.TestCase):
         # self.assertEqual(window.end.date(), today)
         # self.assertEqual(datetime.strftime(window.end, "%H:%M:%S"), "00:00:00")
 
+    def test_from_cfg_error(self):
+        with self.assertRaises(AssertionError):
+            TimeWindow.from_cfg("invalid input")
+
+        with self.assertRaises(KeyError):
+            TimeWindow.from_cfg({"bad_key": 1})
+
     def test_from_day(self):
         window = TimeWindow.for_day(self.start.date())
 

@@ -70,6 +70,9 @@ class TestFactory(unittest.TestCase):
         windowed_monitor = load_from_config("./tests/data/windowed-query.yaml")
         self.assertTrue(isinstance(windowed_monitor, WindowedQueryMonitor))
 
+        day_window_monitor = load_from_config("./tests/data/day-window.yaml")
+        self.assertTrue(isinstance(day_window_monitor, WindowedQueryMonitor))
+
         left_bounded_monitor = load_from_config("./tests/data/left-bounded.yaml")
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
 
