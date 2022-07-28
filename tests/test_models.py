@@ -1,7 +1,6 @@
-import datetime
 import unittest
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from duneapi.types import QueryParameter
 
@@ -10,7 +9,7 @@ from src.models import TimeWindow, LeftBound, TimeUnit
 
 class TestTimeWindow(unittest.TestCase):
     def setUp(self) -> None:
-        self.start = datetime.datetime(year=1985, month=3, day=10)
+        self.start = datetime(year=1985, month=3, day=10)
 
     def test_constructor(self):
         start = self.start
@@ -29,7 +28,33 @@ class TestTimeWindow(unittest.TestCase):
         )
         self.assertEqual(window.end - window.start, timedelta(hours=length))
         self.assertEqual(window.length, length)
-        # Not sure if it makes sense to text the actual start since now() will evaluate differently...
+
+        window = TimeWindow.from_cfg("yesterday")
+        today = datetime.today().date()
+        yesterday = today - timedelta(days=1)
+
+        self.assertEqual(window.start, datetime.combine(yesterday, datetime.min.time()))
+        # The above assertion is equivalent to
+        # self.assertEqual(window.start.date(), yesterday)
+        # self.assertEqual(datetime.strftime(window.start, "%H:%M:%S"), "00:00:00")
+
+        self.assertEqual(window.end, datetime.combine(today, datetime.min.time()))
+
+    def test_from_cfg_error(self):
+        with self.assertRaises(AssertionError):
+            TimeWindow.from_cfg("invalid input")
+
+        with self.assertRaises(KeyError):
+            TimeWindow.from_cfg({"bad_key": 1})
+
+    def test_from_day(self):
+        window = TimeWindow.for_day(self.start.date())
+
+        self.assertEqual(window.start, self.start)
+        self.assertEqual(window.end, self.start + timedelta(days=1))
+        self.assertEqual(window.end, self.start + timedelta(hours=24))
+        self.assertEqual(datetime.strftime(window.start, "%H:%M:%S"), "00:00:00")
+        self.assertEqual(datetime.strftime(window.end, "%H:%M:%S"), "00:00:00")
 
     def test_next(self):
         window = TimeWindow(self.start)
@@ -59,12 +84,6 @@ class TestLeftBound(unittest.TestCase):
         self.assertEqual(self.left_bound.offset, 1)
 
     def test_from_cfg(self):
-        from_cfg = LeftBound.from_cfg(
-            {
-                "offset": 1,
-                "units": TimeUnit.MINUTES,
-            }
-        )
         self.assertEqual(
             LeftBound.from_cfg(
                 {
