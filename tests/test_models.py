@@ -34,12 +34,11 @@ class TestTimeWindow(unittest.TestCase):
         yesterday = today - timedelta(days=1)
 
         self.assertEqual(window.start, datetime.combine(yesterday, datetime.min.time()))
+        # The above assertion is equivalent to
         # self.assertEqual(window.start.date(), yesterday)
         # self.assertEqual(datetime.strftime(window.start, "%H:%M:%S"), "00:00:00")
 
         self.assertEqual(window.end, datetime.combine(today, datetime.min.time()))
-        # self.assertEqual(window.end.date(), today)
-        # self.assertEqual(datetime.strftime(window.end, "%H:%M:%S"), "00:00:00")
 
     def test_from_cfg_error(self):
         with self.assertRaises(AssertionError):
