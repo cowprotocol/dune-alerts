@@ -33,11 +33,15 @@ class TimeWindow:
         return TimeWindow.for_day(date.today() - timedelta(days=1))
 
     @classmethod
-    def for_day(cls, day: date):
+    def for_day(cls, day: date) -> TimeWindow:
+        """
+        Constructs TimeWindow for given day
+        (i.e. 24 time window beginning at midnight on specified day)
+        """
         return cls(
             # this is datetime object from date
             start=datetime.combine(day, datetime.min.time()),
-            length_hours=24
+            length_hours=24,
         )
 
     def as_query_parameters(self) -> list[QueryParameter]:
