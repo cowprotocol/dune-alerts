@@ -33,9 +33,9 @@ parameters:
 ```
 
 where `DUNE_QUERY_ID` is found in the url of your existing query.
-For example, the integer at the end of this url https://dune.com/queries/857522.
+Concretely, it is the integer at the end of this url https://dune.com/queries/857522.
 
-For more details on query parameter configuration, please visit
+For more examples on query parameter configuration, checkout our test examples [./tests/data](./tests/data/)
 
 With all the configuration in place, then you can run the alerter with
 
