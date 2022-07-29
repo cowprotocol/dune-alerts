@@ -68,7 +68,7 @@ class BaseQueryMonitor(ABC):
         """
         Standard run-loop refreshing query, fetching results and alerting if necessary.
         """
-        log.info(f'Refreshing "{self.name}" query {self.query_id}')
+        log.info(f'Refreshing "{self.name}" query {self.result_url()}')
         results = self.refresh(dune)
         if len(results) > self.threshold:
             log.error(self.alert_message(len(results)))
