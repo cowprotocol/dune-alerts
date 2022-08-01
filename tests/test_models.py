@@ -100,7 +100,7 @@ class TestLeftBound(unittest.TestCase):
             [
                 QueryParameter.enum_type(
                     name="TimeUnits",
-                    value=TimeUnit.MINUTES.value,
+                    value=str(TimeUnit.MINUTES.value),
                     options=TimeUnit.options(),
                 ),
                 QueryParameter.number_type(name="Offset", value=1),

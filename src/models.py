@@ -71,7 +71,7 @@ class TimeUnit(Enum):
     @classmethod
     def options(cls) -> list[str]:
         """Returns a list of all available enum items"""
-        return [e.value for e in cls]
+        return [str(e.value) for e in cls]
 
 
 class LeftBound:
@@ -85,7 +85,9 @@ class LeftBound:
         """Returns DuneQueryParameters for object instance"""
         return [
             QueryParameter.enum_type(
-                name="TimeUnits", value=self.units.value, options=TimeUnit.options()
+                name="TimeUnits",
+                value=str(self.units.value),
+                options=TimeUnit.options(),
             ),
             QueryParameter.number_type(name="Offset", value=self.offset),
         ]
