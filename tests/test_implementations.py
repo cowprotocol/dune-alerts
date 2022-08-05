@@ -5,6 +5,7 @@ from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
 from src.query_monitor.base import QueryMonitor
+from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.factory import load_from_config
 from src.query_monitor.windowed import WindowedQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
@@ -28,9 +29,22 @@ class TestQueryMonitor(unittest.TestCase):
             window=TimeWindow(start=self.date),
             params=self.query_params,
         )
+        self.counter = CounterQueryMonitor(
+            name="Counter",
+            query_id=1,
+            column="col_name",
+            alert_value=1.0,
+        )
 
     def test_result_url(self):
-        self.assertEqual(self.monitor.result_url(), "https://dune.com/queries/0")
+        self.assertEqual(
+            self.monitor.result_url(),
+            f"https://dune.com/queries/{self.monitor.query_id}",
+        )
+        self.assertEqual(
+            self.counter.result_url(),
+            f"https://dune.com/queries/{self.counter.query_id}",
+        )
         self.assertEqual(
             self.windowed_monitor.result_url(),
             "https://dune.com/queries/1?StartTime=1985-03-10+00%3A00%3A00&EndTime=1985-03-10+06%3A00%3A00",
@@ -42,19 +56,32 @@ class TestQueryMonitor(unittest.TestCase):
             self.windowed_monitor.parameters(),
             self.query_params + self.windowed_monitor.window.as_query_parameters(),
         )
+        self.assertEqual(self.counter.parameters(), [])
 
     def test_alert_message(self):
         self.assertEqual(
-            self.monitor.alert_message(1),
+            self.monitor.alert_message([{}]),
             f"{self.monitor.name} - detected 1 cases. "
             f"Results available at {self.monitor.result_url()}",
         )
 
         self.assertEqual(
-            self.windowed_monitor.alert_message(2),
+            self.windowed_monitor.alert_message([{}, {}]),
             f"{self.windowed_monitor.name} - detected 2 cases. "
             f"Results available at {self.windowed_monitor.result_url()}",
         )
+
+        ctr = self.counter
+        self.assertEqual(
+            ctr.alert_message([{ctr.column: ctr.alert_value + 1}]),
+            f"Query Counter: {ctr.column} exceeds {ctr.alert_value} "
+            f"with {ctr.alert_value + 1} (cf. https://dune.com/queries/{ctr.query_id})",
+        )
+
+        with self.assertRaises(AssertionError):
+            self.counter.alert_message([])
+        with self.assertRaises(KeyError):
+            self.counter.alert_message([{}])
 
 
 class TestFactory(unittest.TestCase):
@@ -75,6 +102,9 @@ class TestFactory(unittest.TestCase):
 
         left_bounded_monitor = load_from_config("./tests/data/left-bounded.yaml")
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
+
+        counter_monitor = load_from_config("./tests/data/counter.yaml")
+        self.assertTrue(isinstance(counter_monitor, CounterQueryMonitor))
 
 
 if __name__ == "__main__":

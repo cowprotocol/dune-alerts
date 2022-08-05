@@ -8,6 +8,7 @@ from duneapi.types import QueryParameter
 
 from src.models import TimeWindow, LeftBound
 from src.query_monitor.base import BaseQueryMonitor, QueryMonitor
+from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.windowed import WindowedQueryMonitor
 
@@ -30,5 +31,7 @@ def load_from_config(config_yaml: str) -> BaseQueryMonitor:
         # Left Bounded Query
         left_bound = LeftBound.from_cfg(cfg["left_bound"])
         return LeftBoundedQueryMonitor(name, query_id, left_bound, params, threshold)
-
+    if "column" in cfg and "alert_value" in cfg:
+        column, alert_value = cfg["column"], float(cfg["alert_value"])
+        return CounterQueryMonitor(name, query_id, column, alert_value, params)
     return QueryMonitor(name, query_id, params, threshold)
