@@ -3,14 +3,12 @@ Main entry point to slackbot query monitoring
 """
 import argparse
 import os
-import ssl
 
-import certifi
 import dotenv
 from duneapi.api import DuneAPI
-from slack.web.client import WebClient
 
 from src.query_monitor.factory import load_from_config
+from src.slack_client import BasicSlackClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Missing Tokens")
@@ -24,13 +22,9 @@ if __name__ == "__main__":
 
     dotenv.load_dotenv()
     query_monitor = load_from_config(args.query_config)
-
-    query_monitor.run_loop(
-        dune=DuneAPI.new_from_environment(),
-        slack_client=WebClient(
-            token=os.environ["SLACK_TOKEN"],
-            # https://stackoverflow.com/questions/59808346/python-3-slack-client-ssl-sslcertverificationerror
-            ssl=ssl.create_default_context(cafile=certifi.where()),
-        ),
-        alert_channel=os.environ["SLACK_ALERT_CHANNEL"],
+    # Set the third party communications to non-trivial after config instantiation
+    query_monitor.slack_client = BasicSlackClient(
+        token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
     )
+    query_monitor.dune = DuneAPI.new_from_environment()
+    query_monitor.run_loop()
