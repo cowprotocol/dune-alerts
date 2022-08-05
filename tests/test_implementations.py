@@ -45,13 +45,13 @@ class TestQueryMonitor(unittest.TestCase):
 
     def test_alert_message(self):
         self.assertEqual(
-            self.monitor.alert_message(1),
+            self.monitor.alert_message([{}]),
             f"{self.monitor.name} - detected 1 cases. "
             f"Results available at {self.monitor.result_url()}",
         )
 
         self.assertEqual(
-            self.windowed_monitor.alert_message(2),
+            self.windowed_monitor.alert_message([{}, {}]),
             f"{self.windowed_monitor.name} - detected 2 cases. "
             f"Results available at {self.windowed_monitor.result_url()}",
         )
