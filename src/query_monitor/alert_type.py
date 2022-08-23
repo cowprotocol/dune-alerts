@@ -17,5 +17,3 @@ class Alert:
     @classmethod
     def default(cls) -> Alert:
         return Alert(AlertType.NONE, "")
-
-

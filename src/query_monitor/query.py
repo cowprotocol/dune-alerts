@@ -43,11 +43,6 @@ class BaseQuery(ABC):
             return Alert(
                 kind=AlertType.SLACK,
                 value=f"{self.name} - detected {num_results} cases. "
-                      f"Results available at {self.result_url()}"
+                f"Results available at {self.result_url()}",
             )
         return Alert.default()
-
-
-class NoResultsQuery(BaseQuery):
-    """This is essentially the base query monitor with all default methods"""
-

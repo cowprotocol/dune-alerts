@@ -4,18 +4,17 @@ Implementation of BaseQueryMonitor for "windowed" queries having StartTime and E
 import logging.config
 import urllib.parse
 from datetime import datetime, timedelta
-from typing import Optional
 
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
-from src.query_monitor.base import BaseQueryMonitor
+from src.query_monitor.no_results import Query, ResultThresholdQuery
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 
-class WindowedQueryMonitor(BaseQueryMonitor):
+class WindowedQueryMonitor(ResultThresholdQuery):
     """
     All queries here, must have `StartTime` and `EndTime` as parameters,
     set by an instance's window attribute via window.as_query_parameters()
@@ -25,18 +24,16 @@ class WindowedQueryMonitor(BaseQueryMonitor):
 
     def __init__(
         self,
-        name: str,
-        query_id: int,
+        query: Query,
         window: TimeWindow,
-        params: Optional[list[QueryParameter]] = None,
         threshold: int = 0,
     ):
-        super().__init__(name, query_id, params, threshold)
+        super().__init__(query, threshold)
         self._set_window(window)
 
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with window parameters appended"""
-        return self.fixed_params + self.window.as_query_parameters()
+        return self.query.params + self.window.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""

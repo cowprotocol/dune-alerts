@@ -1,14 +1,13 @@
 """Implementation of BaseQueryMonitor for queries beginning from StartTime"""
 import urllib.parse
-from typing import Optional
 
 from duneapi.types import QueryParameter
 
 from src.models import LeftBound
-from src.query_monitor.base import BaseQueryMonitor
+from src.query_monitor.no_results import Query, QueryMonitor, ResultThresholdQuery
 
 
-class LeftBoundedQueryMonitor(BaseQueryMonitor):
+class LeftBoundedQueryMonitor(ResultThresholdQuery):
     """
     All queries here, must have `StartTime` as parameter.
     This is set by an instance's left_bound attribute.
@@ -16,18 +15,16 @@ class LeftBoundedQueryMonitor(BaseQueryMonitor):
 
     def __init__(
         self,
-        name: str,
-        query_id: int,
+        query: Query,
         left_bound: LeftBound,
-        params: Optional[list[QueryParameter]] = None,
         threshold: int = 0,
     ):
-        super().__init__(name, query_id, params, threshold)
+        super().__init__(query, threshold)
         self.left_bound = left_bound
 
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with left bound parameter appended"""
-        return self.fixed_params + self.left_bound.as_query_parameters()
+        return self.query.params + self.left_bound.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""

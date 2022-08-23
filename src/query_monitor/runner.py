@@ -7,26 +7,28 @@ import logging.config
 
 from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
-from slack.web.client import WebClient
 
 from src.query_monitor.alert_type import AlertType
-from src.query_monitor.base_query import NoResultsQuery
+from src.query_monitor.no_results import QueryMonitor
 from src.slack_client import BasicSlackClient
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 
-class QueryMonitor:
-    query: NoResultsQuery
-    dune: DuneAPI
-    slack_client: BasicSlackClient
+class QueryRunner:
+
+    def __init__(self, query: QueryMonitor, dune: DuneAPI, slack_client: BasicSlackClient):
+        self.query = query
+        self.dune = dune
+        self.slack_client = slack_client
 
     def refresh(self) -> list[DuneRecord]:
         """Executes dune query by ID, and fetches the results by job ID returned"""
         # TODO - this could probably live in the base duneapi library.
-        log.info(f'Refreshing "{self.query.name}" query {self.query.result_url()}')
-        job_id = self.dune.execute(self.query.query_id, self.query.parameters())
+        query = self.query
+        log.info(f'Refreshing "{query.name}" query {query.result_url()}')
+        job_id = self.dune.execute(query.query_id, query.parameters())
         return self.dune.get_results(job_id)
 
     def run_loop(self) -> None:
