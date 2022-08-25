@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
-from src.query_monitor.no_results import Query, ResultThresholdQuery
+from src.query_monitor.base import QueryData
+from src.query_monitor.result_threshold import ResultThresholdQuery
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
@@ -24,7 +25,7 @@ class WindowedQueryMonitor(ResultThresholdQuery):
 
     def __init__(
         self,
-        query: Query,
+        query: QueryData,
         window: TimeWindow,
         threshold: int = 0,
     ):
@@ -33,7 +34,7 @@ class WindowedQueryMonitor(ResultThresholdQuery):
 
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with window parameters appended"""
-        return self.query.params + self.window.as_query_parameters()
+        return (self.query.params or []) + self.window.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""

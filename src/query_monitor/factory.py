@@ -7,17 +7,18 @@ import yaml
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow, LeftBound
+from src.query_monitor.base import QueryBase, QueryData
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
-from src.query_monitor.no_results import Query, QueryMonitor, ResultThresholdQuery
+from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor
 
 
-def load_from_config(config_yaml: str) -> QueryMonitor:
+def load_from_config(config_yaml: str) -> QueryBase:
     """Loads a QueryMonitor object from yaml configuration file"""
     with open(config_yaml, "r", encoding="utf-8") as yaml_file:
         cfg = yaml.load(yaml_file, yaml.Loader)
 
-    query = Query(
+    query = QueryData(
         name=cfg["name"],
         query_id=cfg["id"],
         params=[

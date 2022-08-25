@@ -4,7 +4,8 @@ import urllib.parse
 from duneapi.types import QueryParameter
 
 from src.models import LeftBound
-from src.query_monitor.no_results import Query, QueryMonitor, ResultThresholdQuery
+from src.query_monitor.base import QueryData
+from src.query_monitor.result_threshold import ResultThresholdQuery
 
 
 class LeftBoundedQueryMonitor(ResultThresholdQuery):
@@ -15,7 +16,7 @@ class LeftBoundedQueryMonitor(ResultThresholdQuery):
 
     def __init__(
         self,
-        query: Query,
+        query: QueryData,
         left_bound: LeftBound,
         threshold: int = 0,
     ):
@@ -24,7 +25,7 @@ class LeftBoundedQueryMonitor(ResultThresholdQuery):
 
     def parameters(self) -> list[QueryParameter]:
         """Similar to the base model, but with left bound parameter appended"""
-        return self.query.params + self.left_bound.as_query_parameters()
+        return (self.query.params or []) + self.left_bound.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""

@@ -4,8 +4,9 @@ import unittest
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
-from src.query_monitor.base import QueryMonitor
+from src.query_monitor.base import QueryData
 from src.query_monitor.factory import load_from_config
+from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 
@@ -19,21 +20,22 @@ class TestQueryMonitor(unittest.TestCase):
             QueryParameter.number_type("Text", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
         ]
-        self.monitor = QueryMonitor(
-            name="Monitor", query_id=0, params=self.query_params
+        query = QueryData(
+            name="Monitor",
+            query_id=0,
+            params=self.query_params
         )
+        self.monitor = ResultThresholdQuery(query)
         self.windowed_monitor = WindowedQueryMonitor(
-            name="Windowed Monitor",
-            query_id=1,
+            query,
             window=TimeWindow(start=self.date),
-            params=self.query_params,
         )
 
     def test_result_url(self):
         self.assertEqual(self.monitor.result_url(), "https://dune.com/queries/0")
         self.assertEqual(
             self.windowed_monitor.result_url(),
-            "https://dune.com/queries/1?StartTime=1985-03-10+00%3A00%3A00&EndTime=1985-03-10+06%3A00%3A00",
+            "https://dune.com/queries/0?StartTime=1985-03-10+00%3A00%3A00&EndTime=1985-03-10+06%3A00%3A00",
         )
 
     def test_parameters(self):
@@ -60,12 +62,12 @@ class TestQueryMonitor(unittest.TestCase):
 class TestFactory(unittest.TestCase):
     def test_load_from_config(self):
         no_params_monitor = load_from_config("./tests/data/no-params.yaml")
-        self.assertTrue(isinstance(no_params_monitor, QueryMonitor))
+        self.assertTrue(isinstance(no_params_monitor, ResultThresholdQuery))
         self.assertEqual(no_params_monitor.parameters(), [])
 
         with_params_monitor = load_from_config("./tests/data/with-params.yaml")
         self.assertGreater(len(with_params_monitor.parameters()), 0)
-        self.assertTrue(isinstance(with_params_monitor, QueryMonitor))
+        self.assertTrue(isinstance(with_params_monitor, ResultThresholdQuery))
 
         windowed_monitor = load_from_config("./tests/data/windowed-query.yaml")
         self.assertTrue(isinstance(windowed_monitor, WindowedQueryMonitor))

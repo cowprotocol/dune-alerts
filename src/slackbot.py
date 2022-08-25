@@ -27,8 +27,7 @@ if __name__ == "__main__":
         query=load_from_config(args.query_config),
         dune=DuneAPI.new_from_environment(),
         slack_client=BasicSlackClient(
-            token=os.environ["SLACK_TOKEN"],
-            channel=os.environ["SLACK_ALERT_CHANNEL"]
-        )
+            token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
+        ),
     )
     query_runner.run_loop()

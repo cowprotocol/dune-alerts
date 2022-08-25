@@ -8,8 +8,8 @@ import logging.config
 from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
 
-from src.query_monitor.alert_type import AlertType
-from src.query_monitor.no_results import QueryMonitor
+from src.query_monitor.alert_type import AlertLevel
+from src.query_monitor.base import QueryBase
 from src.slack_client import BasicSlackClient
 
 log = logging.getLogger(__name__)
@@ -17,8 +17,11 @@ logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 
 class QueryRunner:
+    """
+    Refreshes a Dune Query, fetches results and alerts slack if necessary
+    """
 
-    def __init__(self, query: QueryMonitor, dune: DuneAPI, slack_client: BasicSlackClient):
+    def __init__(self, query: QueryBase, dune: DuneAPI, slack_client: BasicSlackClient):
         self.query = query
         self.dune = dune
         self.slack_client = slack_client
@@ -37,8 +40,8 @@ class QueryRunner:
         """
         results = self.refresh()
         alert = self.query.alert_message(results)
-        if alert.kind == AlertType.SLACK:
+        if alert.kind == AlertLevel.SLACK:
             log.warning(alert.value)
             self.slack_client.post(alert.value)
-        elif alert.kind == AlertType.LOG:
+        elif alert.kind == AlertLevel.LOG:
             log.info(alert.value)
