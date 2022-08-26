@@ -7,7 +7,7 @@ from typing import Optional
 
 from duneapi.types import QueryParameter, DuneRecord
 
-from src.query_monitor.alert_type import Alert
+from src.alert import Alert
 
 
 @dataclass

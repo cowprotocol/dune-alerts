@@ -4,7 +4,7 @@ number of results returned is > `threshold`
 """
 from duneapi.types import QueryParameter, DuneRecord
 
-from src.query_monitor.alert_type import Alert, AlertLevel
+from src.alert import Alert, AlertLevel
 from src.query_monitor.base import QueryBase, QueryData
 
 

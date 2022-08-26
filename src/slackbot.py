@@ -8,7 +8,7 @@ import dotenv
 from duneapi.api import DuneAPI
 
 from src.query_monitor.factory import load_from_config
-from src.query_monitor.runner import QueryRunner
+from src.runner import QueryRunner
 from src.slack_client import BasicSlackClient
 
 if __name__ == "__main__":

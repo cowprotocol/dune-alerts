@@ -4,6 +4,7 @@ import unittest
 from duneapi.types import QueryParameter
 
 from src.models import TimeWindow
+from src.alert import Alert, AlertLevel
 from src.query_monitor.base import QueryData
 from src.query_monitor.factory import load_from_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
@@ -20,11 +21,7 @@ class TestQueryMonitor(unittest.TestCase):
             QueryParameter.number_type("Text", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
         ]
-        query = QueryData(
-            name="Monitor",
-            query_id=0,
-            params=self.query_params
-        )
+        query = QueryData(name="Monitor", query_id=0, params=self.query_params)
         self.monitor = ResultThresholdQuery(query)
         self.windowed_monitor = WindowedQueryMonitor(
             query,
@@ -48,14 +45,20 @@ class TestQueryMonitor(unittest.TestCase):
     def test_alert_message(self):
         self.assertEqual(
             self.monitor.alert_message([{}]),
-            f"{self.monitor.name} - detected 1 cases. "
-            f"Results available at {self.monitor.result_url()}",
+            Alert(
+                kind=AlertLevel.SLACK,
+                value=f"{self.monitor.name} - detected 1 cases. "
+                f"Results available at {self.monitor.result_url()}",
+            ),
         )
 
         self.assertEqual(
             self.windowed_monitor.alert_message([{}, {}]),
-            f"{self.windowed_monitor.name} - detected 2 cases. "
-            f"Results available at {self.windowed_monitor.result_url()}",
+            Alert(
+                kind=AlertLevel.SLACK,
+                value=f"{self.windowed_monitor.name} - detected 2 cases. "
+                f"Results available at {self.windowed_monitor.result_url()}",
+            ),
         )
 
 

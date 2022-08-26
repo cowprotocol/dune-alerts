@@ -8,7 +8,7 @@ import logging.config
 from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
 
-from src.query_monitor.alert_type import AlertLevel
+from src.alert import AlertLevel
 from src.query_monitor.base import QueryBase
 from src.slack_client import BasicSlackClient
 
