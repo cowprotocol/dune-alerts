@@ -1,5 +1,7 @@
 """
-Abstract class containing Base/Default QueryMonitor attributes.
+Query Runner takes any implementation of QueryBase, a dune connection and slack client.
+It is responsible for refreshing the query, fetching results,
+passing results onto the query and alerting when necessary.
 """
 from __future__ import annotations
 

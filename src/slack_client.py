@@ -25,10 +25,11 @@ class BasicSlackClient:
 
     def post(self, message: str) -> None:
         """Posts `message` to `self.channel` excluding link previews."""
-        self.client.chat_postMessage(
-            channel=self.channel,
-            text=message,
-            # Do not show link preview!
-            # https://api.slack.com/reference/messaging/link-unfurling
-            unfurl_media=False,
-        )
+        print("Dry Run: ", message)
+        # self.client.chat_postMessage(
+        #     channel=self.channel,
+        #     text=message,
+        #     # Do not show link preview!
+        #     # https://api.slack.com/reference/messaging/link-unfurling
+        #     unfurl_media=False,
+        # )
