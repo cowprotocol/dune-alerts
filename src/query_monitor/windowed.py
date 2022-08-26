@@ -1,18 +1,65 @@
 """
 Implementation of BaseQueryMonitor for "windowed" queries having StartTime and EndTime
 """
+from __future__ import annotations
 import logging.config
 import urllib.parse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from duneapi.types import QueryParameter
 
-from src.models import TimeWindow
 from src.query_monitor.base import QueryData
 from src.query_monitor.result_threshold import ResultThresholdQuery
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
+
+
+class TimeWindow:
+    """Handling date arithmetic and string conversions for datetime intervals"""
+
+    def __init__(self, start: datetime, length_hours: int = 6):
+        self.start = start
+        self.end = self.start + timedelta(hours=length_hours)
+        self.length = length_hours
+
+    @classmethod
+    def from_cfg(cls, cfg: dict[str, int] | str) -> TimeWindow:
+        """
+        Loads TimeWindow based on current time and either one of two configurations
+         1. `length` of time window and `offset` (both in hours)
+         2. `yesterday` returning a full date interval
+        """
+        if isinstance(cfg, dict):
+            return cls(
+                start=datetime.now() - timedelta(hours=cfg["offset"]),
+                length_hours=cfg["length"],
+            )
+        assert cfg == "yesterday"
+        return TimeWindow.for_day(date.today() - timedelta(days=1))
+
+    @classmethod
+    def for_day(cls, day: date) -> TimeWindow:
+        """
+        Constructs TimeWindow for given day
+        (i.e. 24 time window beginning at midnight on specified day)
+        """
+        return cls(
+            # this is datetime object from date
+            start=datetime.combine(day, datetime.min.time()),
+            length_hours=24,
+        )
+
+    def as_query_parameters(self) -> list[QueryParameter]:
+        """Dune query parameters defined by the start and end of the window"""
+        return [
+            QueryParameter.date_type(name="StartTime", value=self.start),
+            QueryParameter.date_type(name="EndTime", value=self.end),
+        ]
+
+    def next(self) -> TimeWindow:
+        """Returns a TimeWindow beginning from the end of self with same length"""
+        return TimeWindow(start=self.end, length_hours=self.length)
 
 
 class WindowedQueryMonitor(ResultThresholdQuery):

@@ -3,12 +3,11 @@ import unittest
 
 from duneapi.types import QueryParameter
 
-from src.models import TimeWindow
 from src.alert import Alert, AlertLevel
 from src.query_monitor.base import QueryData
 from src.query_monitor.factory import load_from_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
-from src.query_monitor.windowed import WindowedQueryMonitor
+from src.query_monitor.windowed import WindowedQueryMonitor, TimeWindow
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 
 

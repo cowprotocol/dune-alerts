@@ -6,11 +6,10 @@ from __future__ import annotations
 import yaml
 from duneapi.types import QueryParameter
 
-from src.models import TimeWindow, LeftBound
 from src.query_monitor.base import QueryBase, QueryData
-from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
+from src.query_monitor.left_bounded import LeftBoundedQueryMonitor, LeftBound
 from src.query_monitor.result_threshold import ResultThresholdQuery
-from src.query_monitor.windowed import WindowedQueryMonitor
+from src.query_monitor.windowed import WindowedQueryMonitor, TimeWindow
 
 
 def load_from_config(config_yaml: str) -> QueryBase:
