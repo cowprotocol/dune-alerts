@@ -5,6 +5,7 @@ from duneapi.types import QueryParameter
 
 from src.alert import Alert, AlertLevel
 from src.query_monitor.base import QueryData
+from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.factory import load_from_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor, TimeWindow
@@ -25,6 +26,11 @@ class TestQueryMonitor(unittest.TestCase):
         self.windowed_monitor = WindowedQueryMonitor(
             query,
             window=TimeWindow(start=self.date),
+        )
+        self.counter = CounterQueryMonitor(
+            query,
+            column="col_name",
+            alert_value=1.0,
         )
 
     def test_result_url(self):
@@ -59,6 +65,21 @@ class TestQueryMonitor(unittest.TestCase):
                 f"Results available at {self.windowed_monitor.result_url()}",
             ),
         )
+
+        ctr = self.counter
+        self.assertEqual(
+            ctr.alert_message([{ctr.column: ctr.alert_value + 1}]),
+            Alert(
+                kind=AlertLevel.SLACK,
+                value=f"Query Monitor: {ctr.column} exceeds {ctr.alert_value} "
+                f"with {ctr.alert_value + 1} (cf. https://dune.com/queries/{ctr.query_id})",
+            ),
+        )
+
+        with self.assertRaises(AssertionError):
+            self.counter._result_value([])
+        with self.assertRaises(KeyError):
+            self.counter._result_value([{}])
 
 
 class TestFactory(unittest.TestCase):

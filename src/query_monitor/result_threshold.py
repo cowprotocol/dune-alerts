@@ -22,10 +22,6 @@ class ResultThresholdQuery(QueryBase):
         """
         return self.query.params or []
 
-    def result_url(self) -> str:
-        """Returns a link to query results excluding fixed parameters"""
-        return f"https://dune.com/queries/{self.query_id}"
-
     def alert_message(self, results: list[DuneRecord]) -> Alert:
         """
         Default Alert message if not special implementation is provided.
