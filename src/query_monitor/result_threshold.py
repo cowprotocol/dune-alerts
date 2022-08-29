@@ -23,7 +23,7 @@ class ResultThresholdQuery(QueryBase):
         num_results = len(results)
         if num_results > self.threshold:
             return Alert(
-                kind=AlertLevel.SLACK,
+                level=AlertLevel.SLACK,
                 message=f"{self.name} - detected {num_results} cases. "
                 f"Results available at {self.result_url()}",
             )

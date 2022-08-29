@@ -42,8 +42,8 @@ class QueryRunner:
         """
         results = self.refresh()
         alert = self.query.get_alert(results)
-        if alert.kind == AlertLevel.SLACK:
+        if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)
             self.slack_client.post(alert.message)
-        elif alert.kind == AlertLevel.LOG:
+        elif alert.level == AlertLevel.LOG:
             log.info(alert.message)

@@ -22,7 +22,7 @@ class AlertLevel(Enum):
 class Alert:
     """Encodes a "tuple" of AlertLevel with a message"""
 
-    kind: AlertLevel
+    level: AlertLevel
     message: str
 
     @classmethod

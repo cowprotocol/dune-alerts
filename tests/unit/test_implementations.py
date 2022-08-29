@@ -45,7 +45,7 @@ class TestQueryMonitor(unittest.TestCase):
         self.assertEqual(
             self.monitor.get_alert([{}]),
             Alert(
-                kind=AlertLevel.SLACK,
+                level=AlertLevel.SLACK,
                 message=f"{self.monitor.name} - detected 1 cases. "
                 f"Results available at {self.monitor.result_url()}",
             ),
@@ -54,7 +54,7 @@ class TestQueryMonitor(unittest.TestCase):
         self.assertEqual(
             self.windowed_monitor.get_alert([{}, {}]),
             Alert(
-                kind=AlertLevel.SLACK,
+                level=AlertLevel.SLACK,
                 message=f"{self.windowed_monitor.name} - detected 2 cases. "
                 f"Results available at {self.windowed_monitor.result_url()}",
             ),
