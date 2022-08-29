@@ -11,5 +11,6 @@ parameters:
     type: date
     value: "1985-03-10 00:00:00"
   - key: ListField
-    type: list
+    type: enum
     value: Option 1
+    enumOptions: ['Option 1', 'Option 2']
