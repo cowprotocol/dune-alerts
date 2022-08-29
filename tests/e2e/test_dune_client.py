@@ -3,7 +3,6 @@ import time
 import unittest
 
 import dotenv
-from duneapi.types import DuneRecord
 
 from src.dune_client import (
     DuneClient,

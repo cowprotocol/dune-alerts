@@ -96,8 +96,8 @@ class DuneClient:
     """
 
     def __init__(self, api_key: str):
-        # os.environ["DUNE_API_KEY"]
-        self.token = api_key
+        # TODO - not sure if better read the env here or if the caller should pass it.
+        self.token = api_key  # os.environ["DUNE_API_KEY"]
 
     def execute(self, query: QueryBase) -> ExecutionResponse:
         """Post's to Dune API for execute `query`"""
