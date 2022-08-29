@@ -25,16 +25,16 @@ class CounterQueryMonitor(QueryBase):
         assert len(results) == 1, f"Expected single record, got {results}"
         return float(results[0][self.column])
 
-    def alert_message(self, results: list[DuneRecord]) -> Alert:
+    def get_alert(self, results: list[DuneRecord]) -> Alert:
         result_value = self._result_value(results)
         if result_value > self.alert_value:
             return Alert(
-                kind=AlertLevel.SLACK,
-                value=f"Query {self.name}: {self.column} exceeds {self.alert_value} "
+                level=AlertLevel.SLACK,
+                message=f"Query {self.name}: {self.column} exceeds {self.alert_value} "
                 f"with {self._result_value(results)} (cf. {self.result_url()})",
             )
         return Alert(
-            kind=AlertLevel.LOG,
-            value=f"value of {self.column} = {result_value} "
+            level=AlertLevel.LOG,
+            message=f"value of {self.column} = {result_value} "
             f"does not exceed {self.alert_value}",
         )

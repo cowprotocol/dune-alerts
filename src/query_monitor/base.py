@@ -50,7 +50,7 @@ class QueryBase(ABC):
         return f"https://dune.com/queries/{self.query_id}"
 
     @abstractmethod
-    def alert_message(self, results: list[DuneRecord]) -> Alert:
+    def get_alert(self, results: list[DuneRecord]) -> Alert:
         """
         Default Alert message if not special implementation is provided.
         Says which query returned how many results along with a link to Dune.

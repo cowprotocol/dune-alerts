@@ -22,8 +22,8 @@ class AlertLevel(Enum):
 class Alert:
     """Encodes a "tuple" of AlertLevel with a message"""
 
-    kind: AlertLevel
-    value: str
+    level: AlertLevel
+    message: str
 
     @classmethod
     def default(cls) -> Alert:
