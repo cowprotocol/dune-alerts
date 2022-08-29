@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 
 from duneapi.types import QueryParameter
 
-from src.models import TimeWindow, LeftBound, TimeUnit
+from src.models import LeftBound, TimeUnit, TimeWindow
 
 
 class TestTimeWindow(unittest.TestCase):
