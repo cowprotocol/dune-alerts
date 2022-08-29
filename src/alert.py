@@ -23,7 +23,7 @@ class Alert:
     """Encodes a "tuple" of AlertLevel with a message"""
 
     kind: AlertLevel
-    value: str
+    message: str
 
     @classmethod
     def default(cls) -> Alert:

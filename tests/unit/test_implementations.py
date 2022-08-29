@@ -43,19 +43,19 @@ class TestQueryMonitor(unittest.TestCase):
 
     def test_alert_message(self):
         self.assertEqual(
-            self.monitor.alert_message([{}]),
+            self.monitor.get_alert([{}]),
             Alert(
                 kind=AlertLevel.SLACK,
-                value=f"{self.monitor.name} - detected 1 cases. "
+                message=f"{self.monitor.name} - detected 1 cases. "
                 f"Results available at {self.monitor.result_url()}",
             ),
         )
 
         self.assertEqual(
-            self.windowed_monitor.alert_message([{}, {}]),
+            self.windowed_monitor.get_alert([{}, {}]),
             Alert(
                 kind=AlertLevel.SLACK,
-                value=f"{self.windowed_monitor.name} - detected 2 cases. "
+                message=f"{self.windowed_monitor.name} - detected 2 cases. "
                 f"Results available at {self.windowed_monitor.result_url()}",
             ),
         )

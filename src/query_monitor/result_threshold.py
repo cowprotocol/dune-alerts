@@ -15,7 +15,7 @@ class ResultThresholdQuery(QueryBase):
         super().__init__(query)
         self.threshold = threshold
 
-    def alert_message(self, results: list[DuneRecord]) -> Alert:
+    def get_alert(self, results: list[DuneRecord]) -> Alert:
         """
         Default Alert message if not special implementation is provided.
         Says which query returned how many results along with a link to Dune.
@@ -24,7 +24,7 @@ class ResultThresholdQuery(QueryBase):
         if num_results > self.threshold:
             return Alert(
                 kind=AlertLevel.SLACK,
-                value=f"{self.name} - detected {num_results} cases. "
+                message=f"{self.name} - detected {num_results} cases. "
                 f"Results available at {self.result_url()}",
             )
         return Alert.default()

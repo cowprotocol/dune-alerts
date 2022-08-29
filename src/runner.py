@@ -41,9 +41,9 @@ class QueryRunner:
         Standard run-loop refreshing query, fetching results and alerting if necessary.
         """
         results = self.refresh()
-        alert = self.query.alert_message(results)
+        alert = self.query.get_alert(results)
         if alert.kind == AlertLevel.SLACK:
-            log.warning(alert.value)
-            self.slack_client.post(alert.value)
+            log.warning(alert.message)
+            self.slack_client.post(alert.message)
         elif alert.kind == AlertLevel.LOG:
-            log.info(alert.value)
+            log.info(alert.message)
