@@ -69,13 +69,13 @@ class TimeData:
     def parse(timestamp: str) -> datetime:
         """
         Sample Input:
-        '2022-08-29T06:33:24.913138Z'
-        '2022-08-29T06:33:24.916543331Z'
-        '1970-01-01T00:00:00Z'
+        '2022-08-29T06:33:24.913138Z' (standard expected format)
+        '2022-08-29T06:33:24.916543331Z' (has more than 6 digit milliseconds)
+        '1970-01-01T00:00:00Z' (special case emitted by Dune API).
         """
         # Remove the Z from end of timestamp
         timestamp = timestamp[:-1]
-        # Milliseconds can not exceed 6 digits of Milliseconds
+        # Milliseconds can not exceed 6 digits.
         timestamp = timestamp[:26]
         try:
             return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
@@ -86,13 +86,7 @@ class TimeData:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TimeData:
         """
-        Sample Input:
-        {
-            "submitted_at": "2022-08-29T06:33:24.913138Z",
-            "expires_at": "2024-08-28T06:36:41.58847Z",
-            "execution_started_at": "2022-08-29T06:33:24.916543Z",
-            "execution_ended_at": "2022-08-29T06:36:41.588467Z",
-        }
+        Constructor from dictionary. See unit test for sample input.
         """
         parse = cls.parse
         end = data.get("execution_ended_at", None)
@@ -118,15 +112,7 @@ class ExecutionStatusResponse:
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> ExecutionStatusResponse:
         """
-        Sample input.
-        {
-            "execution_id": "01GBM4W2N0NMCGPZYW8AYK4YF1",
-            "query_id": 980708,
-            "state": "QUERY_STATE_EXECUTING",
-            "submitted_at": "2022-08-29T06:33:24.913138Z",
-            "expires_at": "1970-01-01T00:00:00Z",
-            "execution_started_at": "2022-08-29T06:33:24.916543331Z"
-        }
+        Constructor from dictionary. See unit test for sample input.
         """
         return cls(
             execution_id=data["execution_id"],
@@ -149,15 +135,7 @@ class ResultMetadata:
     @classmethod
     def from_dict(cls, data: dict[str, int | list[str]]) -> ResultMetadata:
         """
-        Sample input.
-        {
-            "column_names": [
-                "ct",
-                "TableName"
-            ],
-            "result_set_bytes": 194,
-            "total_row_count": 8
-        }
+        Constructor from dictionary. See unit test for sample input.
         """
         assert isinstance(data["column_names"], list)
         assert isinstance(data["result_set_bytes"], int)
@@ -183,27 +161,7 @@ class ExecutionResult:
     @classmethod
     def from_dict(cls, data: dict[str, RowData | MetaData]) -> ExecutionResult:
         """
-        Sample Value:
-        {
-            "rows": [
-                {
-                    "TableName": "eth_blocks",
-                    "ct": 6296
-                },
-                {
-                    "TableName": "eth_traces",
-                    "ct": 4474223
-                }
-            ],
-            "metadata": {
-                "column_names": [
-                    "ct",
-                    "TableName"
-                ],
-                "result_set_bytes": 194,
-                "total_row_count": 8
-            }
-        }
+        Constructor from dictionary. See unit test for sample input.
         """
         assert isinstance(data["rows"], list)
         assert isinstance(data["metadata"], dict)
@@ -231,36 +189,7 @@ class ResultsResponse:
     @classmethod
     def from_dict(cls, data: dict[str, str | int | ResultData]) -> ResultsResponse:
         """
-        Sample input.
-        {
-            "execution_id": "01GBM4W2N0NMCGPZYW8AYK4YF1",
-            "query_id": 980708,
-            "state": "QUERY_STATE_COMPLETED",
-            "submitted_at": "2022-08-29T06:33:24.913138Z",
-            "expires_at": "2024-08-28T06:36:41.58847Z",
-            "execution_started_at": "2022-08-29T06:33:24.916543Z",
-            "execution_ended_at": "2022-08-29T06:36:41.588467Z",
-            "result": {
-                "rows": [
-                    {
-                        "TableName": "eth_blocks",
-                        "ct": 6296
-                    },
-                    {
-                        "TableName": "eth_traces",
-                        "ct": 4474223
-                    }
-                ],
-                "metadata": {
-                    "column_names": [
-                        "ct",
-                        "TableName"
-                    ],
-                    "result_set_bytes": 194,
-                    "total_row_count": 8
-                }
-            }
-        }
+        Constructor from dictionary. See unit test for sample input.
         """
         assert isinstance(data["execution_id"], str)
         assert isinstance(data["query_id"], int)
@@ -321,7 +250,7 @@ class DuneClient:
         """
         Executes a Dune query, waits till query execution completes,
         fetches and returns the results.
-        *Sleeps 3 seconds inbetween each request*.
+        *Sleeps 3 seconds between each request*.
         """
         job_id = self.execute(query).execution_id
         while self.get_status(job_id).state == ExecutionState.PENDING:
