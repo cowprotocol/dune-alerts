@@ -28,8 +28,9 @@ class ExecutionState(Enum):
     Enum for possible values of Query Execution
     """
 
-    PENDING = "QUERY_STATE_PENDING"
     COMPLETED = "QUERY_STATE_COMPLETED"
+    EXECUTING = "QUERY_STATE_EXECUTING"
+    PENDING = "QUERY_STATE_PENDING"
 
 
 @dataclass
@@ -69,8 +70,18 @@ class TimeData:
         """
         Sample Input:
         '2022-08-29T06:33:24.913138Z'
+        '2022-08-29T06:33:24.916543331Z'
+        '1970-01-01T00:00:00Z'
         """
-        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # Remove the Z from end of timestamp
+        timestamp = timestamp[:-1]
+        # Milliseconds can not exceed 6 digits of Milliseconds
+        timestamp = timestamp[:26]
+        try:
+            return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+        except ValueError:
+            # This case is specifically for input "1970-01-01T00:00:00Z"
+            return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TimeData:
@@ -84,7 +95,7 @@ class TimeData:
         }
         """
         parse = cls.parse
-        end = data.get("execution_ended_at")
+        end = data.get("execution_ended_at", None)
         return cls(
             submitted_at=parse(data["submitted_at"]),
             expires_at=parse(data["expires_at"]),
