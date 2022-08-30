@@ -25,7 +25,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(status, ExecutionStatusResponse)
         while dune.get_status(job_id).state != ExecutionState.COMPLETED:
             time.sleep(1)
-        results = dune.get_results(job_id)
+        results = dune.get_result(job_id).result.rows
         self.assertGreater(len(results), 0)
 
 

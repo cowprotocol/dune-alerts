@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import Union, Optional, Any
 
 import requests
 from duneapi.types import DuneRecord
@@ -45,9 +46,46 @@ class ExecutionResponse:
             "state": "QUERY_STATE_PENDING"
         }
         """
-        # TODO - isn't there a way to parse a dict directly into an instance
         return cls(
             execution_id=data["execution_id"], state=ExecutionState(data["state"])
+        )
+
+
+@dataclass
+class TimeData:
+    """A collection of all timestamp related values contained within Dune Response"""
+
+    submitted_at: datetime
+    expires_at: datetime
+    execution_started_at: datetime
+    execution_ended_at: Optional[datetime]
+
+    @staticmethod
+    def parse(timestamp: str) -> datetime:
+        """
+        Sample Input:
+        '2022-08-29T06:33:24.913138Z'
+        """
+        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TimeData:
+        """
+        Sample Input:
+        {
+            "submitted_at": "2022-08-29T06:33:24.913138Z",
+            "expires_at": "2024-08-28T06:36:41.58847Z",
+            "execution_started_at": "2022-08-29T06:33:24.916543Z",
+            "execution_ended_at": "2022-08-29T06:36:41.588467Z",
+        }
+        """
+        parse = cls.parse
+        end = data.get("execution_ended_at")
+        return cls(
+            submitted_at=parse(data["submitted_at"]),
+            expires_at=parse(data["expires_at"]),
+            execution_started_at=parse(data["execution_started_at"]),
+            execution_ended_at=None if end is None else parse(end),
         )
 
 
@@ -60,9 +98,7 @@ class ExecutionStatusResponse:
     execution_id: str
     query_id: int
     state: ExecutionState
-    submitted_at: datetime
-    expires_at: datetime
-    execution_started_at: datetime
+    times: TimeData
 
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> ExecutionStatusResponse:
@@ -77,15 +113,150 @@ class ExecutionStatusResponse:
             "execution_started_at": "2022-08-29T06:33:24.916543331Z"
         }
         """
-        # TODO - isn't there a way to parse a dict directly into an instance
         return cls(
             execution_id=data["execution_id"],
             query_id=int(data["query_id"]),
             state=ExecutionState(data["state"]),
-            # TODO - parse the dates...
-            submitted_at=datetime.now(),
-            expires_at=datetime.now(),
-            execution_started_at=datetime.now(),
+            times=TimeData.from_dict(data),  # Sending the entire data dict
+        )
+
+
+@dataclass
+class ResultMetadata:
+    """
+    Representation of Dune's Result Metadata from [Get] Query Results endpoint
+    """
+
+    column_names: list[str]
+    result_set_bytes: int
+    total_row_count: int
+
+    @classmethod
+    def from_dict(cls, data: dict[str, int | list[str]]) -> ResultMetadata:
+        """
+        Sample input.
+        {
+            "column_names": [
+                "ct",
+                "TableName"
+            ],
+            "result_set_bytes": 194,
+            "total_row_count": 8
+        }
+        """
+        assert isinstance(data["column_names"], list)
+        assert isinstance(data["result_set_bytes"], int)
+        assert isinstance(data["total_row_count"], int)
+        return cls(
+            column_names=data["column_names"],
+            result_set_bytes=int(data["result_set_bytes"]),
+            total_row_count=int(data["total_row_count"]),
+        )
+
+
+RowData = list[dict[str, str]]
+MetaData = dict[str, Union[int, list[str]]]
+
+
+@dataclass
+class ExecutionResult:
+    """Representation of `result` field of a Dune ResultsResponse"""
+
+    rows: list[DuneRecord]
+    metadata: ResultMetadata
+
+    @classmethod
+    def from_dict(cls, data: dict[str, RowData | MetaData]) -> ExecutionResult:
+        """
+        Sample Value:
+        {
+            "rows": [
+                {
+                    "TableName": "eth_blocks",
+                    "ct": 6296
+                },
+                {
+                    "TableName": "eth_traces",
+                    "ct": 4474223
+                }
+            ],
+            "metadata": {
+                "column_names": [
+                    "ct",
+                    "TableName"
+                ],
+                "result_set_bytes": 194,
+                "total_row_count": 8
+            }
+        }
+        """
+        assert isinstance(data["rows"], list)
+        assert isinstance(data["metadata"], dict)
+        return cls(
+            rows=data["rows"],
+            metadata=ResultMetadata.from_dict(data["metadata"]),
+        )
+
+
+ResultData = dict[str, Union[RowData, MetaData]]
+
+
+@dataclass
+class ResultsResponse:
+    """
+    Representation of Response from Dune's [Get] Query Results endpoint
+    """
+
+    execution_id: str
+    query_id: int
+    state: ExecutionState
+    times: TimeData
+    result: ExecutionResult
+
+    @classmethod
+    def from_dict(cls, data: dict[str, str | int | ResultData]) -> ResultsResponse:
+        """
+        Sample input.
+        {
+            "execution_id": "01GBM4W2N0NMCGPZYW8AYK4YF1",
+            "query_id": 980708,
+            "state": "QUERY_STATE_COMPLETED",
+            "submitted_at": "2022-08-29T06:33:24.913138Z",
+            "expires_at": "2024-08-28T06:36:41.58847Z",
+            "execution_started_at": "2022-08-29T06:33:24.916543Z",
+            "execution_ended_at": "2022-08-29T06:36:41.588467Z",
+            "result": {
+                "rows": [
+                    {
+                        "TableName": "eth_blocks",
+                        "ct": 6296
+                    },
+                    {
+                        "TableName": "eth_traces",
+                        "ct": 4474223
+                    }
+                ],
+                "metadata": {
+                    "column_names": [
+                        "ct",
+                        "TableName"
+                    ],
+                    "result_set_bytes": 194,
+                    "total_row_count": 8
+                }
+            }
+        }
+        """
+        assert isinstance(data["execution_id"], str)
+        assert isinstance(data["query_id"], int)
+        assert isinstance(data["state"], str)
+        assert isinstance(data["result"], dict)
+        return cls(
+            execution_id=data["execution_id"],
+            query_id=int(data["query_id"]),
+            state=ExecutionState(data["state"]),
+            times=TimeData.from_dict(data),
+            result=ExecutionResult.from_dict(data["result"]),
         )
 
 
@@ -96,8 +267,7 @@ class DuneClient:
     """
 
     def __init__(self, api_key: str):
-        # TODO - not sure if better read the env here or if the caller should pass it.
-        self.token = api_key  # os.environ["DUNE_API_KEY"]
+        self.token = api_key
 
     def execute(self, query: QueryBase) -> ExecutionResponse:
         """Post's to Dune API for execute `query`"""
@@ -123,16 +293,14 @@ class DuneClient:
         # TODO - log raw_response
         return ExecutionStatusResponse.from_dict(raw_response.json())
 
-    def get_results(self, job_id: str) -> list[DuneRecord]:
+    def get_result(self, job_id: str) -> ResultsResponse:
         """GET results from Dune API for `job_id` (aka `execution_id`)"""
         raw_response = requests.get(
             url=f"{BASE_URL}/execution/{job_id}/results",
             headers={"x-dune-api-key": self.token},
         )
         # TODO - log raw_response
-        # TODO - define a class representing Full Response
-        results: list[DuneRecord] = raw_response.json()["result"]["rows"]
-        return results
+        return ResultsResponse.from_dict(raw_response.json())
 
     def refresh(self, query: QueryBase) -> list[DuneRecord]:
         """
@@ -146,4 +314,4 @@ class DuneClient:
             # TODO - use a better model for status pings.
             time.sleep(3)
 
-        return self.get_results(job_id)
+        return self.get_result(job_id).result.rows
