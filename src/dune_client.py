@@ -5,6 +5,7 @@ https://duneanalytics.notion.site/API-Documentation-1b93d16e0fa941398e15047f643e
 """
 from __future__ import annotations
 
+import logging.config
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -15,6 +16,9 @@ import requests
 from duneapi.types import DuneRecord
 
 from src.query_monitor.base import QueryBase
+
+log = logging.getLogger(__name__)
+logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 BASE_URL = "https://api.dune.com/api/v1"
 
@@ -281,7 +285,7 @@ class DuneClient:
             },
             headers={"x-dune-api-key": self.token},
         )
-        # TODO - log raw_response
+        log.debug(f"execute response {raw_response.json()}")
         return ExecutionResponse.from_dict(raw_response.json())
 
     def get_status(self, job_id: str) -> ExecutionStatusResponse:
@@ -290,7 +294,7 @@ class DuneClient:
             url=f"{BASE_URL}/execution/{job_id}/status",
             headers={"x-dune-api-key": self.token},
         )
-        # TODO - log raw_response
+        log.debug(f"get_status response {raw_response.json()}")
         return ExecutionStatusResponse.from_dict(raw_response.json())
 
     def get_result(self, job_id: str) -> ResultsResponse:
@@ -299,7 +303,7 @@ class DuneClient:
             url=f"{BASE_URL}/execution/{job_id}/results",
             headers={"x-dune-api-key": self.token},
         )
-        # TODO - log raw_response
+        log.debug(f"get_result response {raw_response.json()}")
         return ResultsResponse.from_dict(raw_response.json())
 
     def refresh(self, query: QueryBase) -> list[DuneRecord]:
@@ -310,7 +314,7 @@ class DuneClient:
         """
         job_id = self.execute(query).execution_id
         while self.get_status(job_id).state == ExecutionState.PENDING:
-            print("waiting for query execution to complete!")
+            log.info(f"waiting for query execution {job_id} to complete")
             # TODO - use a better model for status pings.
             time.sleep(3)
 
