@@ -44,13 +44,7 @@ class ExecutionResponse:
 
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> ExecutionResponse:
-        """
-        Sample Value:
-        {
-            "execution_id": "01GB1Y2MRA4C9PNQ0EQYVT4K6R",
-            "state": "QUERY_STATE_PENDING"
-        }
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         return cls(
             execution_id=data["execution_id"], state=ExecutionState(data["state"])
         )
@@ -85,9 +79,7 @@ class TimeData:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TimeData:
-        """
-        Constructor from dictionary. See unit test for sample input.
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         parse = cls.parse
         end = data.get("execution_ended_at", None)
         return cls(
@@ -111,9 +103,7 @@ class ExecutionStatusResponse:
 
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> ExecutionStatusResponse:
-        """
-        Constructor from dictionary. See unit test for sample input.
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         return cls(
             execution_id=data["execution_id"],
             query_id=int(data["query_id"]),
@@ -134,9 +124,7 @@ class ResultMetadata:
 
     @classmethod
     def from_dict(cls, data: dict[str, int | list[str]]) -> ResultMetadata:
-        """
-        Constructor from dictionary. See unit test for sample input.
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         assert isinstance(data["column_names"], list)
         assert isinstance(data["result_set_bytes"], int)
         assert isinstance(data["total_row_count"], int)
@@ -160,9 +148,7 @@ class ExecutionResult:
 
     @classmethod
     def from_dict(cls, data: dict[str, RowData | MetaData]) -> ExecutionResult:
-        """
-        Constructor from dictionary. See unit test for sample input.
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         assert isinstance(data["rows"], list)
         assert isinstance(data["metadata"], dict)
         return cls(
@@ -188,9 +174,7 @@ class ResultsResponse:
 
     @classmethod
     def from_dict(cls, data: dict[str, str | int | ResultData]) -> ResultsResponse:
-        """
-        Constructor from dictionary. See unit test for sample input.
-        """
+        """Constructor from dictionary. See unit test for sample input."""
         assert isinstance(data["execution_id"], str)
         assert isinstance(data["query_id"], int)
         assert isinstance(data["state"], str)
