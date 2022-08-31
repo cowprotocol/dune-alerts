@@ -7,10 +7,8 @@ from __future__ import annotations
 
 import logging.config
 
-from duneapi.api import DuneAPI
-from duneapi.types import DuneRecord
-
 from src.alert import AlertLevel
+from src.dune_interface import DuneInterface
 from src.query_monitor.base import QueryBase
 from src.slack_client import BasicSlackClient
 
@@ -23,25 +21,21 @@ class QueryRunner:
     Refreshes a Dune Query, fetches results and alerts slack if necessary
     """
 
-    def __init__(self, query: QueryBase, dune: DuneAPI, slack_client: BasicSlackClient):
+    def __init__(
+        self, query: QueryBase, dune: DuneInterface, slack_client: BasicSlackClient
+    ):
         self.query = query
         self.dune = dune
         self.slack_client = slack_client
-
-    def refresh(self) -> list[DuneRecord]:
-        """Executes dune query by ID, and fetches the results by job ID returned"""
-        # TODO - this could probably live in the base duneapi library.
-        query = self.query
-        log.info(f'Refreshing "{query.name}" query {query.result_url()}')
-        job_id = self.dune.execute(query.query_id, query.parameters())
-        return self.dune.get_results(job_id)
 
     def run_loop(self) -> None:
         """
         Standard run-loop refreshing query, fetching results and alerting if necessary.
         """
-        results = self.refresh()
-        alert = self.query.get_alert(results)
+        query = self.query
+        log.info(f'Refreshing "{query.name}" query {query.result_url()}')
+        results = self.dune.refresh(query)
+        alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)
             self.slack_client.post(alert.message)

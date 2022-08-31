@@ -48,10 +48,22 @@ where `QUERY_CONFIG_PATH` is a filepath to the yaml file containing your query c
 This will load the query details, refresh the query with given parameters, fetch the results and send an alert to the
 configured Slack channel if warranted.
 
+Note furthermore that there is an additional command line argument for using the Legacy DuneAPI (i.e. Browser Emulator
+Tool), which doesn't work for Dune's V2 platform.
+The default configuration for this parameter is to use Dune's officially supported API.
+To use the Legacy Dune Client run:
+
+```shell
+python -m src.slackbot --query-config QUERY_CONFIG_PATH --use-legacy-dune True
+```
+
+
 
 ## Run with Docker
 
-From the root of this project, assuming you have a .env file with dune and slack credentials and a query configuration `config.yaml` 
+From the root of this project, assuming you have a .env file with dune and slack credentials and a query
+configuration `config.yaml`
+
 ```shell
 # build
 docker build -t slackbot .
