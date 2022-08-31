@@ -15,6 +15,7 @@ from typing import Union, Optional, Any
 import requests
 from duneapi.types import DuneRecord
 
+from src.dune_interface import DuneInterface
 from src.query_monitor.base import QueryBase
 
 log = logging.getLogger(__name__)
@@ -188,7 +189,7 @@ class ResultsResponse:
         )
 
 
-class DuneClient:
+class DuneClient(DuneInterface):
     """
     An interface for Dune API with a few convenience methods
     combining the use of endpoints (e.g. refresh)
