@@ -1,0 +1,16 @@
+name: Sample Query
+id: 1215383
+parameters:
+  - key: TextField
+    type: text
+    value: word
+  - key: NumberField
+    type: number
+    value: 3.14
+  - key: DateField
+    type: date
+    value: "1985-03-10 00:00:00"
+  - key: ListField
+    type: enum
+    value: Option 1
+    enumOptions: ['Option 1', 'Option 2']
