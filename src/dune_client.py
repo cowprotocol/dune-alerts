@@ -13,6 +13,7 @@ from enum import Enum
 from typing import Union, Optional, Any
 
 import requests
+from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
 
 from src.dune_interface import DuneInterface
@@ -238,9 +239,21 @@ class DuneClient(DuneInterface):
         *Sleeps 3 seconds between each request*.
         """
         job_id = self.execute(query).execution_id
-        while self.get_status(job_id).state == ExecutionState.PENDING:
+        while self.get_status(job_id).state != ExecutionState.COMPLETED:
             log.info(f"waiting for query execution {job_id} to complete")
             # TODO - use a better model for status pings.
-            time.sleep(3)
+            time.sleep(5)
 
         return self.get_result(job_id).result.rows
+
+
+class LegacyDuneClient(DuneInterface):
+    """Implementation of DuneInterface using the "legacy" (browser emulator) duneapi"""
+
+    def __init__(self, dune: DuneAPI):
+        self.dune = dune
+
+    def refresh(self, query: QueryBase) -> list[DuneRecord]:
+        """Executes dune query by ID, and fetches the results by job ID returned"""
+        job_id = self.dune.execute(query.query_id, query.parameters())
+        return self.dune.get_results(job_id)
