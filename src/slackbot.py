@@ -8,29 +8,22 @@ import dotenv
 from duneapi.api import DuneAPI
 
 from src.dune_client import DuneClient, LegacyDuneClient
+from src.dune_interface import DuneInterface
+from src.query_monitor.base import QueryBase
 from src.query_monitor.factory import load_from_config
 from src.runner import QueryRunner
 from src.slack_client import BasicSlackClient
 
 
-def run_slackbot(config_yaml: str, use_legacy_dune: bool, dry_run: bool) -> None:
+def run_slackbot(
+    query: QueryBase, dune: DuneInterface, slack_client: BasicSlackClient
+) -> None:
     """
     This is the main method of the program.
     Instantiate a query runner, and execute its run_loop
     """
-    dotenv.load_dotenv()
-    query_runner = QueryRunner(
-        query=load_from_config(config_yaml),
-        dune=(
-            LegacyDuneClient(DuneAPI.new_from_environment())
-            if use_legacy_dune
-            else DuneClient(os.environ["DUNE_API_KEY"])
-        ),
-        slack_client=BasicSlackClient(
-            token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
-        ),
-    )
-    query_runner.run_loop(dry_run)
+    query_runner = QueryRunner(query, dune, slack_client)
+    query_runner.run_loop()
 
 
 if __name__ == "__main__":
@@ -47,15 +40,16 @@ if __name__ == "__main__":
         help="Indicate whether legacy duneapi client should be used.",
         default=False,
     )
-    parser.add_argument(
-        "--dry-run",
-        type=bool,
-        help="Indicate whether the Slack level alert message should not be posted.",
-        default=False,
-    )
     args = parser.parse_args()
+    dotenv.load_dotenv()
     run_slackbot(
-        config_yaml=args.query_config,
-        use_legacy_dune=args.use_legacy_dune,
-        dry_run=args.dry_run,
+        query=load_from_config(args.query_config),
+        dune=(
+            LegacyDuneClient(DuneAPI.new_from_environment())
+            if args.use_legacy_dune
+            else DuneClient(os.environ["DUNE_API_KEY"])
+        ),
+        slack_client=BasicSlackClient(
+            token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
+        ),
     )

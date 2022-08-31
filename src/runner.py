@@ -28,7 +28,7 @@ class QueryRunner:
         self.dune = dune
         self.slack_client = slack_client
 
-    def run_loop(self, dry_run: bool = False) -> None:
+    def run_loop(self) -> None:
         """
         Standard run-loop refreshing query, fetching results and alerting if necessary.
         """
@@ -38,6 +38,6 @@ class QueryRunner:
         alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)
-            self.slack_client.post(alert.message, dry_run)
+            self.slack_client.post(alert.message)
         elif alert.level == AlertLevel.LOG:
             log.info(alert.message)
