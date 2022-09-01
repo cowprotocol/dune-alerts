@@ -4,6 +4,7 @@ import time
 import unittest
 
 import dotenv
+from requests import JSONDecodeError
 
 from src.dune_client import (
     DuneClient,
@@ -23,15 +24,35 @@ class TestDuneClient(unittest.TestCase):
 
     def test_endpoints(self):
         dune = DuneClient(self.valid_api_key)
+        # POST Execution
         execution_response = dune.execute(self.query)
         self.assertIsInstance(execution_response, ExecutionResponse)
+
+        # GET Execution Status
         job_id = execution_response.execution_id
         status = dune.get_status(job_id)
         self.assertIsInstance(status, ExecutionStatusResponse)
+
+        # GET ExecutionResults
         while dune.get_status(job_id).state != ExecutionState.COMPLETED:
             time.sleep(1)
         results = dune.get_result(job_id).result.rows
         self.assertGreater(len(results), 0)
+
+    def test_cancel_execution(self):
+        dune = DuneClient(self.valid_api_key)
+        query = load_from_config("./tests/data/v2-long-running-query.yaml")
+        execution_response = dune.execute(query)
+        # POST Cancellation
+        with self.assertRaises(JSONDecodeError) as err:
+            dune.cancel_execution(execution_response.execution_id)
+        # This endpoint doesn't work right - only returns 404.
+        # TODO - raise proper error type before attempting to cast to JSON.
+        #  This will have to be done for each endpoint.
+        self.assertEqual(
+            str(err.exception),
+            "Expecting value: line 1 column 1 (char 0)",
+        )
 
     def test_invalid_api_key_error(self):
         dune = DuneClient(api_key="Invalid Key")

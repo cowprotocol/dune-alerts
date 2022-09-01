@@ -5,6 +5,7 @@ https://duneanalytics.notion.site/API-Documentation-1b93d16e0fa941398e15047f643e
 """
 from __future__ import annotations
 
+import json
 import logging.config
 import time
 from dataclasses import dataclass
@@ -255,6 +256,22 @@ class DuneClient(DuneInterface):
             return ResultsResponse.from_dict(response_json)
         except KeyError as err:
             raise DuneError(response_json, "ResultsResponse") from err
+
+    def cancel_execution(self, job_id: str) -> bool:
+        """POST Execution Cancellation to Dune API for `job_id` (aka `execution_id`)"""
+        raw_response = requests.get(
+            # https://api.dune.com/api/v1/execution/{{execution_id}}/cancel
+            url=f"{BASE_URL}/execution/{job_id}/cancel",
+            headers={"x-dune-api-key": self.token},
+        )
+        response_json = raw_response.json()
+        log.debug(f"cancel_execution response {raw_response}")
+        try:
+            # No need to make a dataclass for this since it's just a boolean.
+            success: bool = json.loads(response_json)["success"]
+            return success
+        except KeyError as err:
+            raise DuneError(response_json, "CancellationResponse") from err
 
     def refresh(self, query: QueryBase) -> list[DuneRecord]:
         """
