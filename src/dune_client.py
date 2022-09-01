@@ -26,9 +26,11 @@ BASE_URL = "https://api.dune.com/api/v1"
 
 
 class DuneError(Exception):
-    """Two possibilities I've seen so far
+    """Possibilities seen so far
     {'error': 'invalid API Key'}
     {'error': 'Query not found'}
+    {'error': 'An internal error occured'}
+    {'error': 'The requested execution ID (ID: Wonky Job ID) is invalid.'}
     """
 
     def __init__(self, data: dict[str, str], response_class: str):
