@@ -25,6 +25,18 @@ logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 BASE_URL = "https://api.dune.com/api/v1"
 
 
+class DuneError(Exception):
+    """Possibilities seen so far
+    {'error': 'invalid API Key'}
+    {'error': 'Query not found'}
+    {'error': 'An internal error occured'}
+    {'error': 'The requested execution ID (ID: Wonky Job ID) is invalid.'}
+    """
+
+    def __init__(self, data: dict[str, str], response_class: str):
+        super().__init__(f"Can't build {response_class} from {data}")
+
+
 class ExecutionState(Enum):
     """
     Enum for possible values of Query Execution
@@ -211,8 +223,12 @@ class DuneClient(DuneInterface):
             },
             headers={"x-dune-api-key": self.token},
         )
-        log.debug(f"execute response {raw_response.json()}")
-        return ExecutionResponse.from_dict(raw_response.json())
+        response_json = raw_response.json()
+        log.debug(f"execute response {response_json}")
+        try:
+            return ExecutionResponse.from_dict(response_json)
+        except KeyError as err:
+            raise DuneError(response_json, "ExecutionResponse") from err
 
     def get_status(self, job_id: str) -> ExecutionStatusResponse:
         """GET status from Dune API for `job_id` (aka `execution_id`)"""
@@ -220,8 +236,12 @@ class DuneClient(DuneInterface):
             url=f"{BASE_URL}/execution/{job_id}/status",
             headers={"x-dune-api-key": self.token},
         )
-        log.debug(f"get_status response {raw_response.json()}")
-        return ExecutionStatusResponse.from_dict(raw_response.json())
+        response_json = raw_response.json()
+        log.debug(f"get_status response {response_json}")
+        try:
+            return ExecutionStatusResponse.from_dict(response_json)
+        except KeyError as err:
+            raise DuneError(response_json, "ExecutionStatusResponse") from err
 
     def get_result(self, job_id: str) -> ResultsResponse:
         """GET results from Dune API for `job_id` (aka `execution_id`)"""
@@ -229,8 +249,12 @@ class DuneClient(DuneInterface):
             url=f"{BASE_URL}/execution/{job_id}/results",
             headers={"x-dune-api-key": self.token},
         )
-        log.debug(f"get_result response {raw_response.json()}")
-        return ResultsResponse.from_dict(raw_response.json())
+        response_json = raw_response.json()
+        log.debug(f"get_result response {response_json}")
+        try:
+            return ResultsResponse.from_dict(response_json)
+        except KeyError as err:
+            raise DuneError(response_json, "ResultsResponse") from err
 
     def refresh(self, query: QueryBase) -> list[DuneRecord]:
         """
