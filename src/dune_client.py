@@ -12,6 +12,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Union, Optional, Any
 
+from dateutil.parser import parse
 import requests
 from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
@@ -73,28 +74,9 @@ class TimeData:
     execution_started_at: datetime
     execution_ended_at: Optional[datetime]
 
-    @staticmethod
-    def parse(timestamp: str) -> datetime:
-        """
-        Sample Input:
-        '2022-08-29T06:33:24.913138Z' (standard expected format)
-        '2022-08-29T06:33:24.916543331Z' (has more than 6 digit milliseconds)
-        '1970-01-01T00:00:00Z' (special case emitted by Dune API).
-        """
-        # Remove the Z from end of timestamp
-        timestamp = timestamp[:-1]
-        # Milliseconds can not exceed 6 digits.
-        timestamp = timestamp[:26]
-        try:
-            return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-        except ValueError:
-            # This case is specifically for input "1970-01-01T00:00:00Z"
-            return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
-
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TimeData:
         """Constructor from dictionary. See unit test for sample input."""
-        parse = cls.parse
         end = data.get("execution_ended_at", None)
         return cls(
             submitted_at=parse(data["submitted_at"]),
