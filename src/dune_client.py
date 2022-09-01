@@ -10,12 +10,14 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from json import JSONDecodeError
 from typing import Union, Optional, Any
 
 from dateutil.parser import parse
 import requests
 from duneapi.api import DuneAPI
 from duneapi.types import DuneRecord
+from requests import Response
 
 from src.dune_interface import DuneInterface
 from src.query_monitor.base import QueryBase
@@ -193,19 +195,38 @@ class DuneClient(DuneInterface):
     def __init__(self, api_key: str):
         self.token = api_key
 
+    @staticmethod
+    def _handle_response(
+        response: Response,
+    ) -> Any:
+        try:
+            # Some responses can be decoded and converted to DuneErrors
+            return response.json()
+        except JSONDecodeError as err:
+            # Others can't. Only raise HTTP error for not decodable errors
+            response.raise_for_status()
+            raise ValueError("Unreachable since previous line raises") from err
+
+    def _get(self, url: str) -> Any:
+        response = requests.get(url, headers={"x-dune-api-key": self.token})
+        return self._handle_response(response)
+
+    def _post(self, url: str, params: Any) -> Any:
+        response = requests.post(
+            url=url, params=params, headers={"x-dune-api-key": self.token}
+        )
+        return self._handle_response(response)
+
     def execute(self, query: QueryBase) -> ExecutionResponse:
         """Post's to Dune API for execute `query`"""
-        # https://duneanalytics.notion.site/API-Documentation-1b93d16e0fa941398e15047f643e003a
-        raw_response = requests.post(
+        response_json = self._post(
             url=f"{BASE_URL}/query/{query.query_id}/execute",
             params={
                 "query_parameters": {
                     param.key: param.value for param in query.parameters()
                 }
             },
-            headers={"x-dune-api-key": self.token},
         )
-        response_json = raw_response.json()
         log.debug(f"execute response {response_json}")
         try:
             return ExecutionResponse.from_dict(response_json)
@@ -214,11 +235,9 @@ class DuneClient(DuneInterface):
 
     def get_status(self, job_id: str) -> ExecutionStatusResponse:
         """GET status from Dune API for `job_id` (aka `execution_id`)"""
-        raw_response = requests.get(
+        response_json = self._get(
             url=f"{BASE_URL}/execution/{job_id}/status",
-            headers={"x-dune-api-key": self.token},
         )
-        response_json = raw_response.json()
         log.debug(f"get_status response {response_json}")
         try:
             return ExecutionStatusResponse.from_dict(response_json)
@@ -227,11 +246,7 @@ class DuneClient(DuneInterface):
 
     def get_result(self, job_id: str) -> ResultsResponse:
         """GET results from Dune API for `job_id` (aka `execution_id`)"""
-        raw_response = requests.get(
-            url=f"{BASE_URL}/execution/{job_id}/results",
-            headers={"x-dune-api-key": self.token},
-        )
-        response_json = raw_response.json()
+        response_json = self._get(url=f"{BASE_URL}/execution/{job_id}/results")
         log.debug(f"get_result response {response_json}")
         try:
             return ResultsResponse.from_dict(response_json)
