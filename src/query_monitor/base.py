@@ -2,21 +2,12 @@
 Abstract class containing Base/Default QueryMonitor attributes.
 """
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Optional
 
 from duneapi.types import QueryParameter, DuneRecord
+from dune_client.query import Query
+
 
 from src.alert import Alert
-
-
-@dataclass
-class QueryData:
-    """Basic data structure constituting a Dune Analytics Query."""
-
-    name: str
-    query_id: int
-    params: Optional[list[QueryParameter]] = None
 
 
 class QueryBase(ABC):
@@ -25,7 +16,7 @@ class QueryBase(ABC):
     that are extended on in some implementations.
     """
 
-    def __init__(self, query: QueryData):
+    def __init__(self, query: Query):
         self.query = query
 
     @property

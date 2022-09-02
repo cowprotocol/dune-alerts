@@ -1,9 +1,10 @@
 """QueryMonitor for Counters. Alert set to valuation"""
 
 from duneapi.types import DuneRecord
+from dune_client.query import Query
 
 from src.alert import Alert, AlertLevel
-from src.query_monitor.base import QueryBase, QueryData
+from src.query_monitor.base import QueryBase
 
 
 class CounterQueryMonitor(QueryBase):
@@ -13,7 +14,7 @@ class CounterQueryMonitor(QueryBase):
 
     def __init__(
         self,
-        query: QueryData,
+        query: Query,
         column: str,
         alert_value: float = 0.0,
     ):

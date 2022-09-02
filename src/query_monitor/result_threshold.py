@@ -3,15 +3,16 @@ Elementary implementation of QueryBase that alerts when
 number of results returned is > `threshold`
 """
 from duneapi.types import DuneRecord
+from dune_client.query import Query
 
 from src.alert import Alert, AlertLevel
-from src.query_monitor.base import QueryBase, QueryData
+from src.query_monitor.base import QueryBase
 
 
 class ResultThresholdQuery(QueryBase):
     """This is essentially the base query monitor with all default methods"""
 
-    def __init__(self, query: QueryData, threshold: int = 0):
+    def __init__(self, query: Query, threshold: int = 0):
         super().__init__(query)
         self.threshold = threshold
 

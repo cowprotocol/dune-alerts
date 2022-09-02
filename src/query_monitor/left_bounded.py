@@ -3,9 +3,9 @@ from __future__ import annotations
 import urllib.parse
 
 from duneapi.types import QueryParameter
+from dune_client.query import Query
 
 from src.models import LeftBound
-from src.query_monitor.base import QueryData
 from src.query_monitor.result_threshold import ResultThresholdQuery
 
 
@@ -17,7 +17,7 @@ class LeftBoundedQueryMonitor(ResultThresholdQuery):
 
     def __init__(
         self,
-        query: QueryData,
+        query: Query,
         left_bound: LeftBound,
         threshold: int = 0,
     ):
