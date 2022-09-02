@@ -218,7 +218,7 @@ class DuneClient(DuneInterface):
     def _post(self, url: str, params: Any) -> Any:
         log.debug(f"POST with input url={url}, params={params}")
         response = requests.post(
-            url=url, params=params, headers={"x-dune-api-key": self.token}
+            url=url, json=params, headers={"x-dune-api-key": self.token}
         )
         return self._handle_response(response)
 
@@ -228,7 +228,9 @@ class DuneClient(DuneInterface):
             url=f"{BASE_URL}/query/{query.query_id}/execute",
             params={
                 "query_parameters": {
-                    param.key: param.value for param in query.parameters()
+                    # TODO - change query parameters to make class._value_str() public.
+                    param.key: param.to_dict()["value"]
+                    for param in query.parameters()
                 }
             },
         )
