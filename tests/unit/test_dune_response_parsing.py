@@ -1,6 +1,8 @@
 import unittest
 from datetime import datetime
 
+from dateutil.tz import tzutc
+
 from src.dune_client import (
     ExecutionResponse,
     ExecutionStatusResponse,
@@ -62,19 +64,23 @@ class MyTestCase(unittest.TestCase):
 
     def test_parse_time_data(self):
         expected_with_end = TimeData(
-            submitted_at=datetime(2022, 8, 29, 6, 33, 24, 913138),
-            expires_at=datetime(2024, 8, 28, 6, 36, 41, 588470),
-            execution_started_at=datetime(2022, 8, 29, 6, 33, 24, 916543),
-            execution_ended_at=datetime(2022, 8, 29, 6, 36, 41, 588467),
+            submitted_at=datetime(2022, 8, 29, 6, 33, 24, 913138, tzinfo=tzutc()),
+            expires_at=datetime(2024, 8, 28, 6, 36, 41, 588470, tzinfo=tzutc()),
+            execution_started_at=datetime(
+                2022, 8, 29, 6, 33, 24, 916543, tzinfo=tzutc()
+            ),
+            execution_ended_at=datetime(2022, 8, 29, 6, 36, 41, 588467, tzinfo=tzutc()),
         )
         self.assertEqual(
             expected_with_end, TimeData.from_dict(self.results_response_data)
         )
 
         expected_without_end = TimeData(
-            submitted_at=datetime(2022, 8, 29, 6, 33, 24, 913138),
-            expires_at=datetime(1970, 1, 1, 0, 0),
-            execution_started_at=datetime(2022, 8, 29, 6, 33, 24, 916543),
+            submitted_at=datetime(2022, 8, 29, 6, 33, 24, 913138, tzinfo=tzutc()),
+            expires_at=datetime(1970, 1, 1, 0, 0, tzinfo=tzutc()),
+            execution_started_at=datetime(
+                2022, 8, 29, 6, 33, 24, 916543, tzinfo=tzutc()
+            ),
             execution_ended_at=None,
         )
         self.assertEqual(
