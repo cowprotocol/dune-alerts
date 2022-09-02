@@ -44,15 +44,8 @@ class TestDuneClient(unittest.TestCase):
         query = load_from_config("./tests/data/v2-long-running-query.yaml")
         execution_response = dune.execute(query)
         # POST Cancellation
-        with self.assertRaises(JSONDecodeError) as err:
-            dune.cancel_execution(execution_response.execution_id)
-        # This endpoint doesn't work right - only returns 404.
-        # TODO - raise proper error type before attempting to cast to JSON.
-        #  This will have to be done for each endpoint.
-        self.assertEqual(
-            str(err.exception),
-            "Expecting value: line 1 column 1 (char 0)",
-        )
+        success = dune.cancel_execution(execution_response.execution_id)
+        self.assertTrue(success)
 
     def test_invalid_api_key_error(self):
         dune = DuneClient(api_key="Invalid Key")
