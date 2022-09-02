@@ -48,6 +48,7 @@ class ExecutionState(Enum):
     COMPLETED = "QUERY_STATE_COMPLETED"
     EXECUTING = "QUERY_STATE_EXECUTING"
     PENDING = "QUERY_STATE_PENDING"
+    CANCELLED = "QUERY_STATE_CANCELLED"
 
 
 @dataclass
@@ -201,17 +202,21 @@ class DuneClient(DuneInterface):
     ) -> Any:
         try:
             # Some responses can be decoded and converted to DuneErrors
-            return response.json()
+            response_json = response.json()
+            log.debug(f"received response {response_json}")
+            return response_json
         except JSONDecodeError as err:
             # Others can't. Only raise HTTP error for not decodable errors
             response.raise_for_status()
             raise ValueError("Unreachable since previous line raises") from err
 
     def _get(self, url: str) -> Any:
+        log.debug(f"GET with input url={url}")
         response = requests.get(url, headers={"x-dune-api-key": self.token})
         return self._handle_response(response)
 
     def _post(self, url: str, params: Any) -> Any:
+        log.debug(f"POST with input url={url}, params={params}")
         response = requests.post(
             url=url, params=params, headers={"x-dune-api-key": self.token}
         )
@@ -228,7 +233,6 @@ class DuneClient(DuneInterface):
                 }
             },
         )
-        log.debug(f"execute response {response_json}")
         try:
             return ExecutionResponse.from_dict(response_json)
         except KeyError as err:
@@ -239,7 +243,6 @@ class DuneClient(DuneInterface):
         response_json = self._get(
             url=f"{BASE_URL}/execution/{job_id}/status",
         )
-        log.debug(f"get_status response {response_json}")
         try:
             return ExecutionStatusResponse.from_dict(response_json)
         except KeyError as err:
@@ -248,11 +251,22 @@ class DuneClient(DuneInterface):
     def get_result(self, job_id: str) -> ResultsResponse:
         """GET results from Dune API for `job_id` (aka `execution_id`)"""
         response_json = self._get(url=f"{BASE_URL}/execution/{job_id}/results")
-        log.debug(f"get_result response {response_json}")
         try:
             return ResultsResponse.from_dict(response_json)
         except KeyError as err:
             raise DuneError(response_json, "ResultsResponse") from err
+
+    def cancel_execution(self, job_id: str) -> bool:
+        """POST Execution Cancellation to Dune API for `job_id` (aka `execution_id`)"""
+        response_json = self._post(
+            url=f"{BASE_URL}/execution/{job_id}/cancel", params=None
+        )
+        try:
+            # No need to make a dataclass for this since it's just a boolean.
+            success: bool = response_json["success"]
+            return success
+        except KeyError as err:
+            raise DuneError(response_json, "CancellationResponse") from err
 
     def refresh(self, query: QueryBase) -> list[DuneRecord]:
         """
