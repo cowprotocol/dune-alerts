@@ -38,7 +38,7 @@ if __name__ == "__main__":
         "--use-legacy-dune",
         type=bool,
         help="Indicate whether legacy duneapi client should be used.",
-        default=True,
+        default=False,
     )
     args = parser.parse_args()
     dotenv.load_dotenv()
