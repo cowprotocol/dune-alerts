@@ -229,7 +229,8 @@ class DuneClient(DuneInterface):
             params={
                 "query_parameters": {
                     # TODO - change query parameters to make class._value_str() public.
-                    param.key: param.to_dict()["value"] for param in query.parameters()
+                    param.key: param.to_dict()["value"]
+                    for param in query.parameters()
                 }
             },
         )
