@@ -17,18 +17,19 @@ class TestQueryMonitor(unittest.TestCase):
         self.date = datetime.datetime(year=1985, month=3, day=10)
         self.query_params = [
             QueryParameter.enum_type("Enum", "option1"),
-            QueryParameter.text_type("Text", "option1"),
-            QueryParameter.number_type("Text", 12),
+            QueryParameter.text_type("Text", "plain text"),
+            QueryParameter.number_type("Number", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
         ]
-        query = Query(name="Monitor", query_id=0, params=self.query_params)
-        self.monitor = ResultThresholdQuery(query)
+        self.monitor = ResultThresholdQuery(
+            query=Query(name="Monitor", query_id=0, params=self.query_params)
+        )
         self.windowed_monitor = WindowedQueryMonitor(
-            query,
+            query=Query(name="Windowed Monitor", query_id=0, params=self.query_params),
             window=TimeWindow(start=self.date),
         )
         self.counter = CounterQueryMonitor(
-            query,
+            query=Query(name="Counter Monitor", query_id=0, params=self.query_params),
             column="col_name",
             alert_value=1.0,
         )
@@ -71,7 +72,7 @@ class TestQueryMonitor(unittest.TestCase):
             ctr.get_alert([{ctr.column: ctr.alert_value + 1}]),
             Alert(
                 level=AlertLevel.SLACK,
-                message=f"Query Monitor: {ctr.column} exceeds {ctr.alert_value} "
+                message=f"Query Counter Monitor: {ctr.column} exceeds {ctr.alert_value} "
                 f"with {ctr.alert_value + 1} (cf. https://dune.com/queries/{ctr.query_id})",
             ),
         )

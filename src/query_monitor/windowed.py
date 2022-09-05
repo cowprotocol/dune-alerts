@@ -6,7 +6,6 @@ import logging.config
 import urllib.parse
 from datetime import datetime, timedelta
 
-from dune_client.types import QueryParameter
 from dune_client.query import Query
 
 from src.models import TimeWindow
@@ -32,10 +31,8 @@ class WindowedQueryMonitor(ResultThresholdQuery):
     ):
         super().__init__(query, threshold)
         self._set_window(window)
-
-    def parameters(self) -> list[QueryParameter]:
-        """Similar to the base model, but with window parameters appended"""
-        return (self.query.params or []) + self.window.as_query_parameters()
+        # Need to update the Query Parameters
+        self.query.params = self.query.parameters() + self.window.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""

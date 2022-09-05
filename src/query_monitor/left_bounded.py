@@ -2,7 +2,6 @@
 from __future__ import annotations
 import urllib.parse
 
-from dune_client.types import QueryParameter
 from dune_client.query import Query
 
 from src.models import LeftBound
@@ -23,10 +22,7 @@ class LeftBoundedQueryMonitor(ResultThresholdQuery):
     ):
         super().__init__(query, threshold)
         self.left_bound = left_bound
-
-    def parameters(self) -> list[QueryParameter]:
-        """Similar to the base model, but with left bound parameter appended"""
-        return (self.query.params or []) + self.left_bound.as_query_parameters()
+        self.query.params = self.query.parameters() + left_bound.as_query_parameters()
 
     def result_url(self) -> str:
         """Returns a link to the query"""
