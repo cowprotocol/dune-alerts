@@ -6,7 +6,7 @@ import logging.config
 import urllib.parse
 from datetime import datetime, timedelta
 
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 from dune_client.query import Query
 
 from src.models import TimeWindow

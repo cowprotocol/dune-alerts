@@ -3,7 +3,7 @@ Abstract class containing Base/Default QueryMonitor attributes.
 """
 from abc import ABC, abstractmethod
 
-from duneapi.types import QueryParameter, DuneRecord
+from dune_client.types import QueryParameter, DuneRecord
 from dune_client.query import Query
 
 

@@ -5,7 +5,6 @@ from unittest.mock import patch
 import dotenv
 from dune_client.client import DuneClient
 
-from src.legacy_dune import LegacyDuneClient
 from src.query_monitor.factory import load_from_config
 from src.runner import QueryRunner
 from src.slack_client import BasicSlackClient

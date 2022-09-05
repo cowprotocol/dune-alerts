@@ -1,9 +1,8 @@
-duneapi==4.0.0
-dune-client==0.0.0
+dune-client==0.0.1
 slackclient==2.9.4
 PyYAML==6.0
 types-python-dateutil==2.8.19
-types-PyYAML==6.0.10
+types-PyYAML==6.0.11
 python-dateutil==2.8.2
-python-dotenv==0.20.0
+python-dotenv==0.21.0
 certifi==2022.6.15

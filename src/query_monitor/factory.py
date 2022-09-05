@@ -4,7 +4,7 @@ Factory method to load QueryMonitor object from yaml configuration files
 from __future__ import annotations
 
 import yaml
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 from dune_client.query import Query
 
 from src.models import TimeWindow, LeftBound

@@ -2,7 +2,7 @@
 from __future__ import annotations
 import urllib.parse
 
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 from dune_client.query import Query
 
 from src.models import LeftBound

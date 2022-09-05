@@ -1,6 +1,6 @@
 """QueryMonitor for Counters. Alert set to valuation"""
 
-from duneapi.types import DuneRecord
+from dune_client.types import DuneRecord
 from dune_client.query import Query
 
 from src.alert import Alert, AlertLevel

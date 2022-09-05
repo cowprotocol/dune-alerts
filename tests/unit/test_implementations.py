@@ -2,7 +2,7 @@ import datetime
 import unittest
 
 from dune_client.query import Query
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 
 from src.alert import Alert, AlertLevel
 from src.query_monitor.counter import CounterQueryMonitor
@@ -16,7 +16,7 @@ class TestQueryMonitor(unittest.TestCase):
     def setUp(self) -> None:
         self.date = datetime.datetime(year=1985, month=3, day=10)
         self.query_params = [
-            QueryParameter.enum_type("Enum", "option1", ["option1", "option2"]),
+            QueryParameter.enum_type("Enum", "option1"),
             QueryParameter.text_type("Text", "option1"),
             QueryParameter.number_type("Text", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
