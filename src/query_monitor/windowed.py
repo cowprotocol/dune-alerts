@@ -7,9 +7,9 @@ import urllib.parse
 from datetime import datetime, timedelta
 
 from duneapi.types import QueryParameter
+from dune_client.query import Query
 
 from src.models import TimeWindow
-from src.query_monitor.base import QueryData
 from src.query_monitor.result_threshold import ResultThresholdQuery
 
 log = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class WindowedQueryMonitor(ResultThresholdQuery):
 
     def __init__(
         self,
-        query: QueryData,
+        query: Query,
         window: TimeWindow,
         threshold: int = 0,
     ):

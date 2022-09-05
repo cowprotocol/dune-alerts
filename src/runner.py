@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import logging.config
 
+from dune_client.interface import DuneInterface
+
 from src.alert import AlertLevel
-from src.dune_interface import DuneInterface
 from src.query_monitor.base import QueryBase
 from src.slack_client import BasicSlackClient
 
@@ -34,7 +35,7 @@ class QueryRunner:
         """
         query = self.query
         log.info(f'Refreshing "{query.name}" query {query.result_url()}')
-        results = self.dune.refresh(query)
+        results = self.dune.refresh(query.query)
         alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)

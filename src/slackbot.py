@@ -6,9 +6,10 @@ import os
 
 import dotenv
 from duneapi.api import DuneAPI
+from dune_client.client import DuneClient
+from dune_client.interface import DuneInterface
 
-from src.dune_client import DuneClient, LegacyDuneClient
-from src.dune_interface import DuneInterface
+from src.legacy_dune import LegacyDuneClient
 from src.query_monitor.base import QueryBase
 from src.query_monitor.factory import load_from_config
 from src.runner import QueryRunner

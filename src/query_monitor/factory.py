@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import yaml
 from duneapi.types import QueryParameter
+from dune_client.query import Query
 
 from src.models import TimeWindow, LeftBound
-from src.query_monitor.base import QueryBase, QueryData
+from src.query_monitor.base import QueryBase
 from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.result_threshold import ResultThresholdQuery
@@ -19,7 +20,7 @@ def load_from_config(config_yaml: str) -> QueryBase:
     with open(config_yaml, "r", encoding="utf-8") as yaml_file:
         cfg = yaml.load(yaml_file, yaml.Loader)
 
-    query = QueryData(
+    query = Query(
         name=cfg["name"],
         query_id=cfg["id"],
         params=[

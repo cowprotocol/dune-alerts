@@ -1,10 +1,10 @@
 import datetime
 import unittest
 
+from dune_client.query import Query
 from duneapi.types import QueryParameter
 
 from src.alert import Alert, AlertLevel
-from src.query_monitor.base import QueryData
 from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.factory import load_from_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
@@ -21,7 +21,7 @@ class TestQueryMonitor(unittest.TestCase):
             QueryParameter.number_type("Text", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
         ]
-        query = QueryData(name="Monitor", query_id=0, params=self.query_params)
+        query = Query(name="Monitor", query_id=0, params=self.query_params)
         self.monitor = ResultThresholdQuery(query)
         self.windowed_monitor = WindowedQueryMonitor(
             query,
