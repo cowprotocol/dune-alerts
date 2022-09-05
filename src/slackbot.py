@@ -5,6 +5,7 @@ import argparse
 import os
 
 import dotenv
+
 from dune_client.client import DuneClient
 from dune_client.interface import DuneInterface
 
