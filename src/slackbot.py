@@ -5,11 +5,10 @@ import argparse
 import os
 
 import dotenv
-from duneapi.api import DuneAPI
+
 from dune_client.client import DuneClient
 from dune_client.interface import DuneInterface
 
-from src.legacy_dune import LegacyDuneClient
 from src.query_monitor.base import QueryBase
 from src.query_monitor.factory import load_from_config
 from src.runner import QueryRunner
@@ -35,21 +34,11 @@ if __name__ == "__main__":
         help="YAML configuration file for a QueryMonitor object",
         required=True,
     )
-    parser.add_argument(
-        "--use-legacy-dune",
-        type=bool,
-        help="Indicate whether legacy duneapi client should be used.",
-        default=False,
-    )
     args = parser.parse_args()
     dotenv.load_dotenv()
     run_slackbot(
         query=load_from_config(args.query_config),
-        dune=(
-            LegacyDuneClient(DuneAPI.new_from_environment())
-            if args.use_legacy_dune
-            else DuneClient(os.environ["DUNE_API_KEY"])
-        ),
+        dune=DuneClient(os.environ["DUNE_API_KEY"]),
         slack_client=BasicSlackClient(
             token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
         ),

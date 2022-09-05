@@ -1,9 +1,9 @@
 """QueryMonitor for Counters. Alert set to valuation"""
 
-from duneapi.types import DuneRecord
+from dune_client.types import DuneRecord
 from dune_client.query import Query
 
-from src.alert import Alert, AlertLevel
+from src.alert import Alert
 from src.query_monitor.base import QueryBase
 
 
@@ -29,13 +29,11 @@ class CounterQueryMonitor(QueryBase):
     def get_alert(self, results: list[DuneRecord]) -> Alert:
         result_value = self._result_value(results)
         if result_value > self.alert_value:
-            return Alert(
-                level=AlertLevel.SLACK,
+            return Alert.slack(
                 message=f"Query {self.name}: {self.column} exceeds {self.alert_value} "
                 f"with {self._result_value(results)} (cf. {self.result_url()})",
             )
-        return Alert(
-            level=AlertLevel.LOG,
+        return Alert.log(
             message=f"value of {self.column} = {result_value} "
             f"does not exceed {self.alert_value}",
         )

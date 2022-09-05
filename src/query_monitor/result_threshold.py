@@ -2,7 +2,7 @@
 Elementary implementation of QueryBase that alerts when
 number of results returned is > `threshold`
 """
-from duneapi.types import DuneRecord
+from dune_client.types import DuneRecord
 from dune_client.query import Query
 
 from src.alert import Alert, AlertLevel
@@ -28,4 +28,4 @@ class ResultThresholdQuery(QueryBase):
                 message=f"{self.name} - detected {num_results} cases. "
                 f"Results available at {self.result_url()}",
             )
-        return Alert.default()
+        return Alert.log("No alert-worthy results detected.")

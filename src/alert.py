@@ -28,4 +28,14 @@ class Alert:
     @classmethod
     def default(cls) -> Alert:
         """Default alert level is non with no message."""
-        return Alert(AlertLevel.NONE, "")
+        return cls(AlertLevel.NONE, "")
+
+    @classmethod
+    def log(cls, message: str) -> Alert:
+        """Easy Log Constructor"""
+        return cls(AlertLevel.LOG, message)
+
+    @classmethod
+    def slack(cls, message: str) -> Alert:
+        """Easy Slack variant constructor"""
+        return cls(AlertLevel.SLACK, message)

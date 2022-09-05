@@ -2,7 +2,7 @@ import unittest
 
 from datetime import timedelta, datetime
 
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 
 from src.models import LeftBound, TimeUnit, TimeWindow
 
@@ -101,7 +101,6 @@ class TestLeftBound(unittest.TestCase):
                 QueryParameter.enum_type(
                     name="TimeUnits",
                     value=str(TimeUnit.MINUTES.value),
-                    options=TimeUnit.options(),
                 ),
                 QueryParameter.number_type(name="Offset", value=1),
             ],

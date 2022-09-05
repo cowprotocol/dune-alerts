@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, date
 from enum import Enum
 
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 
 
 class TimeWindow:
@@ -87,7 +87,6 @@ class LeftBound:
             QueryParameter.enum_type(
                 name="TimeUnits",
                 value=str(self.units.value),
-                options=TimeUnit.options(),
             ),
             QueryParameter.number_type(name="Offset", value=self.offset),
         ]

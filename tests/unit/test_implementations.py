@@ -2,7 +2,7 @@ import datetime
 import unittest
 
 from dune_client.query import Query
-from duneapi.types import QueryParameter
+from dune_client.types import QueryParameter
 
 from src.alert import Alert, AlertLevel
 from src.query_monitor.counter import CounterQueryMonitor
@@ -16,28 +16,22 @@ class TestQueryMonitor(unittest.TestCase):
     def setUp(self) -> None:
         self.date = datetime.datetime(year=1985, month=3, day=10)
         self.query_params = [
-            QueryParameter.enum_type("Enum", "option1", ["option1", "option2"]),
-            QueryParameter.text_type("Text", "option1"),
-            QueryParameter.number_type("Text", 12),
+            QueryParameter.enum_type("Enum", "option1"),
+            QueryParameter.text_type("Text", "plain text"),
+            QueryParameter.number_type("Number", 12),
             QueryParameter.date_type("Date", "2021-01-01 12:34:56"),
         ]
-        query = Query(name="Monitor", query_id=0, params=self.query_params)
-        self.monitor = ResultThresholdQuery(query)
+        self.monitor = ResultThresholdQuery(
+            query=Query(name="Monitor", query_id=0, params=self.query_params)
+        )
         self.windowed_monitor = WindowedQueryMonitor(
-            query,
+            query=Query(name="Windowed Monitor", query_id=0, params=self.query_params),
             window=TimeWindow(start=self.date),
         )
         self.counter = CounterQueryMonitor(
-            query,
+            query=Query(name="Counter Monitor", query_id=0, params=self.query_params),
             column="col_name",
             alert_value=1.0,
-        )
-
-    def test_result_url(self):
-        self.assertEqual(self.monitor.result_url(), "https://dune.com/queries/0")
-        self.assertEqual(
-            self.windowed_monitor.result_url(),
-            "https://dune.com/queries/0?StartTime=1985-03-10+00%3A00%3A00&EndTime=1985-03-10+06%3A00%3A00",
         )
 
     def test_parameters(self):
@@ -71,8 +65,8 @@ class TestQueryMonitor(unittest.TestCase):
             ctr.get_alert([{ctr.column: ctr.alert_value + 1}]),
             Alert(
                 level=AlertLevel.SLACK,
-                message=f"Query Monitor: {ctr.column} exceeds {ctr.alert_value} "
-                f"with {ctr.alert_value + 1} (cf. https://dune.com/queries/{ctr.query_id})",
+                message=f"Query Counter Monitor: {ctr.column} exceeds {ctr.alert_value} "
+                f"with {ctr.alert_value + 1} (cf. {ctr.result_url()})",
             ),
         )
 
