@@ -28,4 +28,4 @@ class ResultThresholdQuery(QueryBase):
                 message=f"{self.name} - detected {num_results} cases. "
                 f"Results available at {self.result_url()}",
             )
-        return Alert.default()
+        return Alert.log("No alert-worthy results detected.")

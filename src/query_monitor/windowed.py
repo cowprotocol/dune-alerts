@@ -3,7 +3,6 @@ Implementation of BaseQueryMonitor for "windowed" queries having StartTime and E
 """
 from __future__ import annotations
 import logging.config
-import urllib.parse
 from datetime import datetime, timedelta
 
 from dune_client.query import Query
@@ -34,18 +33,10 @@ class WindowedQueryMonitor(ResultThresholdQuery):
         # Need to update the Query Parameters
         self.query.params = self.query.parameters() + self.window.as_query_parameters()
 
-    def result_url(self) -> str:
-        """Returns a link to the query"""
-        base = super().result_url()
-        # Include variable parameters in the URL so they are set
-        query = "&".join(
-            [f"{p.key}={p.value}" for p in self.window.as_query_parameters()]
-        )
-        return "?".join([base, urllib.parse.quote_plus(query, safe="=&?")])
-
     def _set_window(self, window: TimeWindow) -> None:
         if window.end > datetime.now() - timedelta(hours=2):
             log.warning(
-                "window end time is beyond 2 hours in the past, some data may not yet be available"
+                "window end time is beyond 2 hours in the past, "
+                "some data may not yet be available"
             )
         self.window = window

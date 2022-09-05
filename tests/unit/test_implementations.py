@@ -34,13 +34,6 @@ class TestQueryMonitor(unittest.TestCase):
             alert_value=1.0,
         )
 
-    def test_result_url(self):
-        self.assertEqual(self.monitor.result_url(), "https://dune.com/queries/0")
-        self.assertEqual(
-            self.windowed_monitor.result_url(),
-            "https://dune.com/queries/0?StartTime=1985-03-10+00%3A00%3A00&EndTime=1985-03-10+06%3A00%3A00",
-        )
-
     def test_parameters(self):
         self.assertEqual(self.monitor.parameters(), self.query_params)
         self.assertEqual(
@@ -73,7 +66,7 @@ class TestQueryMonitor(unittest.TestCase):
             Alert(
                 level=AlertLevel.SLACK,
                 message=f"Query Counter Monitor: {ctr.column} exceeds {ctr.alert_value} "
-                f"with {ctr.alert_value + 1} (cf. https://dune.com/queries/{ctr.query_id})",
+                f"with {ctr.alert_value + 1} (cf. {ctr.result_url()})",
             ),
         )
 

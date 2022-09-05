@@ -3,7 +3,7 @@ Abstract class containing Base/Default QueryMonitor attributes.
 """
 from abc import ABC, abstractmethod
 
-from dune_client.types import DuneRecord
+from dune_client.types import DuneRecord, QueryParameter
 from dune_client.query import Query
 
 
@@ -29,9 +29,15 @@ class QueryBase(ABC):
         """Returns (nested) query name - for easier access"""
         return self.query.name
 
+    def parameters(self) -> list[QueryParameter]:
+        """
+        Returning the inner query's parameters.
+        """
+        return self.query.parameters()
+
     def result_url(self) -> str:
         """Returns a link to query results excluding fixed parameters"""
-        return f"https://dune.com/queries/{self.query_id}"
+        return self.query.url()
 
     @abstractmethod
     def get_alert(self, results: list[DuneRecord]) -> Alert:
