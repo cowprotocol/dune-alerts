@@ -1,4 +1,4 @@
-dune-client==0.0.3
+dune-client==0.0.4
 slackclient==2.9.4
 PyYAML==6.0
 types-python-dateutil==2.8.19
