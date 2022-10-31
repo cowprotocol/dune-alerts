@@ -66,3 +66,12 @@ configuration `config.yaml`
 docker build -t slackbot .
 docker run -v ${PWD}/config.yaml:/app/config.yaml --env-file .env slackbot --query-config config.yaml
 ```
+
+
+```shell
+docker run \
+    -v ${PWD}/<CONFIG_FILE>:/app/cfg \
+     --env-file .env \
+     ghcr.io/cowprotocol/dune-alerts \
+     --query-config cfg
+```
