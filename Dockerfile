@@ -1,5 +1,4 @@
-FROM python:alpine
-RUN apk add --update gcc libc-dev linux-headers
+FROM python:3.10
 
 WORKDIR /app
 
