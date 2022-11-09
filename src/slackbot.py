@@ -10,7 +10,7 @@ from dune_client.client import DuneClient
 from dune_client.interface import DuneInterface
 
 from src.query_monitor.base import QueryBase
-from src.query_monitor.factory import load_from_config
+from src.query_monitor.factory import load_config
 from src.runner import QueryRunner
 from src.slack_client import BasicSlackClient
 
@@ -36,10 +36,11 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     dotenv.load_dotenv()
+    config = load_config(args.query_config)
     run_slackbot(
-        query=load_from_config(args.query_config),
+        query=config.query,
         dune=DuneClient(os.environ["DUNE_API_KEY"]),
         slack_client=BasicSlackClient(
-            token=os.environ["SLACK_TOKEN"], channel=os.environ["SLACK_ALERT_CHANNEL"]
+            token=os.environ["SLACK_TOKEN"], channel=config.alert_channel
         ),
     )

@@ -1,0 +1,5 @@
+name: Counter Test
+id: 1
+column: eth_spent
+alert_value: 55
+alert_channel: Specific Channel

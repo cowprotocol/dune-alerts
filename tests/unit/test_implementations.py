@@ -6,7 +6,7 @@ from dune_client.types import QueryParameter
 
 from src.alert import Alert, AlertLevel
 from src.query_monitor.counter import CounterQueryMonitor
-from src.query_monitor.factory import load_from_config
+from src.query_monitor.factory import load_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor, TimeWindow
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
@@ -78,21 +78,21 @@ class TestQueryMonitor(unittest.TestCase):
 
 class TestFactory(unittest.TestCase):
     def test_load_from_config(self):
-        no_params_monitor = load_from_config("./tests/data/no-params.yaml")
+        no_params_monitor = load_config("./tests/data/no-params.yaml").query
         self.assertTrue(isinstance(no_params_monitor, ResultThresholdQuery))
         self.assertEqual(no_params_monitor.parameters(), [])
 
-        with_params_monitor = load_from_config("./tests/data/with-params.yaml")
+        with_params_monitor = load_config("./tests/data/with-params.yaml").query
         self.assertGreater(len(with_params_monitor.parameters()), 0)
         self.assertTrue(isinstance(with_params_monitor, ResultThresholdQuery))
 
-        windowed_monitor = load_from_config("./tests/data/windowed-query.yaml")
+        windowed_monitor = load_config("./tests/data/windowed-query.yaml").query
         self.assertTrue(isinstance(windowed_monitor, WindowedQueryMonitor))
 
-        day_window_monitor = load_from_config("./tests/data/day-window.yaml")
+        day_window_monitor = load_config("./tests/data/day-window.yaml").query
         self.assertTrue(isinstance(day_window_monitor, WindowedQueryMonitor))
 
-        left_bounded_monitor = load_from_config("./tests/data/left-bounded.yaml")
+        left_bounded_monitor = load_config("./tests/data/left-bounded.yaml").query
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
 
 
