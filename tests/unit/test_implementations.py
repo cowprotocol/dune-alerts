@@ -97,6 +97,7 @@ class TestFactory(unittest.TestCase):
 
         left_bounded_monitor = load_config(filepath("left-bounded.yaml")).query
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
+        del os.environ["SLACK_ALERT_CHANNEL"]
 
     def test_load_config_error(self):
         with self.assertRaises(KeyError):
