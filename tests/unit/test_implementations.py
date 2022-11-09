@@ -1,4 +1,5 @@
 import datetime
+import os
 import unittest
 
 from dune_client.query import Query
@@ -78,6 +79,7 @@ class TestQueryMonitor(unittest.TestCase):
 
 class TestFactory(unittest.TestCase):
     def test_load_from_config(self):
+        os.environ["SLACK_ALERT_CHANNEL"] = "dummy channel"
         no_params_monitor = load_config("./tests/data/no-params.yaml").query
         self.assertTrue(isinstance(no_params_monitor, ResultThresholdQuery))
         self.assertEqual(no_params_monitor.parameters(), [])
@@ -94,6 +96,10 @@ class TestFactory(unittest.TestCase):
 
         left_bounded_monitor = load_config("./tests/data/left-bounded.yaml").query
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
+
+    def test_load_config_error(self):
+        with self.assertRaises(KeyError):
+            load_config("./tests/data/no-params.yaml")
 
 
 if __name__ == "__main__":
