@@ -1,10 +1,8 @@
-import unittest
 import os
-from pathlib import Path
+import unittest
 
 from src.query_monitor.factory import load_config
-
-TEST_CONFIG_PATH = Path(__file__).parent.parent / Path("data")
+from tests.file import filepath
 
 
 class TestConfigLoading(unittest.TestCase):
@@ -14,11 +12,11 @@ class TestConfigLoading(unittest.TestCase):
 
     def test_default_config(self):
 
-        config = load_config(os.path.join(TEST_CONFIG_PATH, "counter.yaml"))
+        config = load_config(filepath("counter.yaml"))
         self.assertEqual(config.alert_channel, self.fallback_alert_channel)
 
     def test_specified_channel(self):
-        config = load_config(os.path.join(TEST_CONFIG_PATH, "alert-channel.yaml"))
+        config = load_config(filepath("alert-channel.yaml"))
         self.assertEqual(config.alert_channel, "Specific Channel")
 
 

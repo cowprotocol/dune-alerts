@@ -11,6 +11,7 @@ from src.query_monitor.factory import load_config
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor, TimeWindow
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
+from tests.file import filepath
 
 
 class TestQueryMonitor(unittest.TestCase):
@@ -80,26 +81,26 @@ class TestQueryMonitor(unittest.TestCase):
 class TestFactory(unittest.TestCase):
     def test_load_from_config(self):
         os.environ["SLACK_ALERT_CHANNEL"] = "dummy channel"
-        no_params_monitor = load_config("./tests/data/no-params.yaml").query
+        no_params_monitor = load_config(filepath("no-params.yaml")).query
         self.assertTrue(isinstance(no_params_monitor, ResultThresholdQuery))
         self.assertEqual(no_params_monitor.parameters(), [])
 
-        with_params_monitor = load_config("./tests/data/with-params.yaml").query
+        with_params_monitor = load_config(filepath("with-params.yaml")).query
         self.assertGreater(len(with_params_monitor.parameters()), 0)
         self.assertTrue(isinstance(with_params_monitor, ResultThresholdQuery))
 
-        windowed_monitor = load_config("./tests/data/windowed-query.yaml").query
+        windowed_monitor = load_config(filepath("windowed-query.yaml")).query
         self.assertTrue(isinstance(windowed_monitor, WindowedQueryMonitor))
 
-        day_window_monitor = load_config("./tests/data/day-window.yaml").query
+        day_window_monitor = load_config(filepath("day-window.yaml")).query
         self.assertTrue(isinstance(day_window_monitor, WindowedQueryMonitor))
 
-        left_bounded_monitor = load_config("./tests/data/left-bounded.yaml").query
+        left_bounded_monitor = load_config(filepath("left-bounded.yaml")).query
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
 
     def test_load_config_error(self):
         with self.assertRaises(KeyError):
-            load_config("./tests/data/no-params.yaml")
+            load_config(filepath("no-params.yaml"))
 
 
 if __name__ == "__main__":
