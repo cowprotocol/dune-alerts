@@ -2,6 +2,8 @@
 Factory method to load QueryMonitor object from yaml configuration files
 """
 from __future__ import annotations
+import os
+from dataclasses import dataclass
 
 import yaml
 from dune_client.types import QueryParameter
@@ -15,7 +17,17 @@ from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor
 
 
-def load_from_config(config_yaml: str) -> QueryBase:
+@dataclass
+class Config:
+    """
+    Model for content contained in query config.yaml file
+    """
+
+    query: QueryBase
+    alert_channel: str
+
+
+def load_config(config_yaml: str) -> Config:
     """Loads a QueryMonitor object from yaml configuration file"""
     with open(config_yaml, "r", encoding="utf-8") as yaml_file:
         cfg = yaml.load(yaml_file, yaml.Loader)
@@ -30,18 +42,24 @@ def load_from_config(config_yaml: str) -> QueryBase:
     )
 
     threshold = cfg.get("threshold", 0)
+    base_query: QueryBase
     if "window" in cfg:
         # Windowed Query
         window = TimeWindow.from_cfg(cfg["window"])
-        return WindowedQueryMonitor(query, window, threshold)
-    if "left_bound" in cfg:
+        base_query = WindowedQueryMonitor(query, window, threshold)
+    elif "left_bound" in cfg:
         # Left Bounded Query
         left_bound = LeftBound.from_cfg(cfg["left_bound"])
-        return LeftBoundedQueryMonitor(query, left_bound, threshold)
-
-    if "column" in cfg and "alert_value" in cfg:
+        base_query = LeftBoundedQueryMonitor(query, left_bound, threshold)
+    elif "column" in cfg and "alert_value" in cfg:
         # Counter Query
         column, alert_value = cfg["column"], float(cfg["alert_value"])
-        return CounterQueryMonitor(query, column, alert_value)
+        base_query = CounterQueryMonitor(query, column, alert_value)
+    else:
+        base_query = ResultThresholdQuery(query, threshold)
 
-    return ResultThresholdQuery(query, threshold)
+    return Config(
+        query=base_query,
+        # Use specified channel, or default to "global config"
+        alert_channel=cfg.get("alert_channel", os.environ["SLACK_ALERT_CHANNEL"]),
+    )
