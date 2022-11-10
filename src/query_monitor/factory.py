@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
+import logging.config
 import yaml
 from dune_client.types import QueryParameter
 from dune_client.query import Query
@@ -15,6 +16,10 @@ from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor
+
+
+log = logging.getLogger(__name__)
+logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 
 @dataclass
@@ -31,7 +36,7 @@ def load_config(config_yaml: str) -> Config:
     """Loads a QueryMonitor object from yaml configuration file"""
     with open(config_yaml, "r", encoding="utf-8") as yaml_file:
         cfg = yaml.load(yaml_file, yaml.Loader)
-
+    log.debug(f"config {config_yaml} loaded as {cfg}")
     query = Query(
         name=cfg["name"],
         query_id=cfg["id"],
@@ -58,8 +63,10 @@ def load_config(config_yaml: str) -> Config:
     else:
         base_query = ResultThresholdQuery(query, threshold)
 
-    return Config(
+    config_obj = Config(
         query=base_query,
         # Use specified channel, or default to "global config"
         alert_channel=cfg.get("alert_channel", os.environ["SLACK_ALERT_CHANNEL"]),
     )
+    log.debug(f"config parsed as {config_obj}")
+    return config_obj
