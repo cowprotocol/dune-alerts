@@ -6,8 +6,12 @@ otherwise be unnecessarily repeated.
 import ssl
 
 import certifi
+import logging.config
+from slack.errors import SlackApiError
 from slack.web.client import WebClient
 
+log = logging.getLogger(__name__)
+logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 class BasicSlackClient:
     """
@@ -25,10 +29,14 @@ class BasicSlackClient:
 
     def post(self, message: str) -> None:
         """Posts `message` to `self.channel` excluding link previews."""
-        self.client.chat_postMessage(
-            channel=self.channel,
-            text=message,
-            # Do not show link preview!
-            # https://api.slack.com/reference/messaging/link-unfurling
-            unfurl_media=False,
-        )
+        log.info(f"posting to slack channel: {self.channel}")
+        try:
+            self.client.chat_postMessage(
+                    channel=self.channel,
+                    text=message,
+                    # Do not show link preview!
+                    # https://api.slack.com/reference/messaging/link-unfurling
+                    unfurl_media=False,
+                )
+        except SlackApiError as err:
+            raise RuntimeError(f"slack post failed with {err}") from err
