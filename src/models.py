@@ -3,7 +3,7 @@ Some generic models used throughout the project
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, date, tzinfo
+from datetime import datetime, timedelta, date
 from enum import Enum
 
 from dune_client.types import QueryParameter
