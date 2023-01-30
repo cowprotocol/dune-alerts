@@ -3,7 +3,7 @@ Some generic models used throughout the project
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, tzinfo
 from enum import Enum
 
 from dune_client.types import QueryParameter
@@ -29,8 +29,10 @@ class TimeWindow:
                 start=datetime.now() - timedelta(hours=cfg["offset"]),
                 length_hours=cfg["length"],
             )
-        assert cfg == "yesterday"
-        return TimeWindow.for_day(date.today() - timedelta(days=1))
+        assert cfg in ("yesterday", "last_hour")
+        if cfg == "yesterday":
+            return TimeWindow.for_day(date.today() - timedelta(days=1))
+        return TimeWindow(start=datetime.utcnow() - timedelta(hours=1), length_hours=1)
 
     @classmethod
     def for_day(cls, day: date) -> TimeWindow:
@@ -43,6 +45,7 @@ class TimeWindow:
             start=datetime.combine(day, datetime.min.time()),
             length_hours=24,
         )
+
 
     def as_query_parameters(self) -> list[QueryParameter]:
         """Dune query parameters defined by the start and end of the window"""
