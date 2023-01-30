@@ -46,7 +46,6 @@ class TimeWindow:
             length_hours=24,
         )
 
-
     def as_query_parameters(self) -> list[QueryParameter]:
         """Dune query parameters defined by the start and end of the window"""
         return [
