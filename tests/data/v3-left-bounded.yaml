@@ -1,0 +1,5 @@
+name: V3 Test Left Bounded
+id: 1944696
+left_bound:
+  units: hour
+  offset: 1

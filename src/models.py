@@ -67,6 +67,13 @@ class TimeUnit(Enum):
     DAYS = "days"
     WEEKS = "weeks"
     MONTHS = "months"
+    # Values to support V3 (DuneSQL)
+    SECOND = "second"
+    MINUTE = "minute"
+    HOUR = "hour"
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
 
     @classmethod
     def options(cls) -> list[str]:
