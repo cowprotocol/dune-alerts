@@ -29,8 +29,10 @@ class TimeWindow:
                 start=datetime.now() - timedelta(hours=cfg["offset"]),
                 length_hours=cfg["length"],
             )
-        assert cfg == "yesterday"
-        return TimeWindow.for_day(date.today() - timedelta(days=1))
+        assert cfg in ("yesterday", "last_hour")
+        if cfg == "yesterday":
+            return TimeWindow.for_day(date.today() - timedelta(days=1))
+        return TimeWindow(start=datetime.utcnow() - timedelta(hours=1), length_hours=1)
 
     @classmethod
     def for_day(cls, day: date) -> TimeWindow:
@@ -67,6 +69,13 @@ class TimeUnit(Enum):
     DAYS = "days"
     WEEKS = "weeks"
     MONTHS = "months"
+    # Values to support V3 (DuneSQL)
+    SECOND = "second"
+    MINUTE = "minute"
+    HOUR = "hour"
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
 
     @classmethod
     def options(cls) -> list[str]:
