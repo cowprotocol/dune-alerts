@@ -19,6 +19,15 @@ class TestConfigLoading(unittest.TestCase):
         config = load_config(filepath("alert-channel.yaml"))
         self.assertEqual(config.alert_channel, "Specific Channel")
 
+    def test_ping_frequency(self):
+        # Specified frequency
+        config = load_config(filepath("ping-frequency.yaml"))
+        self.assertEqual(config.ping_frequency, 28)
+
+        # Default (not specified)
+        config = load_config(filepath("counter.yaml"))
+        self.assertEqual(config.ping_frequency, 20)
+
 
 if __name__ == "__main__":
     unittest.main()

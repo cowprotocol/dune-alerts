@@ -29,6 +29,7 @@ class Config:
     """
 
     query: QueryBase
+    ping_frequency: int
     alert_channel: str
 
 
@@ -67,6 +68,8 @@ def load_config(config_yaml: str) -> Config:
         query=base_query,
         # Use specified channel, or default to "global config"
         alert_channel=cfg.get("alert_channel", os.environ["SLACK_ALERT_CHANNEL"]),
+        # This is 4x the DuneClient default of 5 seconds
+        ping_frequency=cfg.get("ping_frequency", 20),
     )
     log.debug(f"config parsed as {config_obj}")
     return config_obj

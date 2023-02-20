@@ -7,7 +7,6 @@ import os
 import dotenv
 
 from dune_client.client import DuneClient
-from dune_client.interface import DuneInterface
 
 from src.query_monitor.base import QueryBase
 from src.query_monitor.factory import load_config
@@ -16,13 +15,16 @@ from src.slack_client import BasicSlackClient
 
 
 def run_slackbot(
-    query: QueryBase, dune: DuneInterface, slack_client: BasicSlackClient
+    query: QueryBase,
+    dune: DuneClient,
+    slack_client: BasicSlackClient,
+    ping_frequency: int,
 ) -> None:
     """
     This is the main method of the program.
     Instantiate a query runner, and execute its run_loop
     """
-    query_runner = QueryRunner(query, dune, slack_client)
+    query_runner = QueryRunner(query, dune, slack_client, ping_frequency)
     query_runner.run_loop()
 
 
@@ -43,4 +45,5 @@ if __name__ == "__main__":
         slack_client=BasicSlackClient(
             token=os.environ["SLACK_TOKEN"], channel=config.alert_channel
         ),
+        ping_frequency=config.ping_frequency,
     )

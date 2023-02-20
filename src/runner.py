@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging.config
 
-from dune_client.interface import DuneInterface
+from dune_client.client import DuneClient
 
 from src.alert import AlertLevel
 from src.query_monitor.base import QueryBase
@@ -23,11 +23,16 @@ class QueryRunner:
     """
 
     def __init__(
-        self, query: QueryBase, dune: DuneInterface, slack_client: BasicSlackClient
+        self,
+        query: QueryBase,
+        dune: DuneClient,
+        slack_client: BasicSlackClient,
+        ping_frequency: int,
     ):
         self.query = query
         self.dune = dune
         self.slack_client = slack_client
+        self.ping_frequency = ping_frequency
 
     def run_loop(self) -> None:
         """
@@ -35,7 +40,7 @@ class QueryRunner:
         """
         query = self.query
         log.info(f'Refreshing "{query.name}" query {query.result_url()}')
-        results = self.dune.refresh(query.query)
+        results = self.dune.refresh(query.query, self.ping_frequency)
         alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)
