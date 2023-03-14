@@ -29,3 +29,9 @@ check:
 	make fmt
 	make lint
 	make types
+
+test-unit:
+	python -m pytest tests/unit
+
+test-e2e:
+	python -m pytest tests/e2e

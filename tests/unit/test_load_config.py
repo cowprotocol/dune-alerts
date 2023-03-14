@@ -6,14 +6,10 @@ from tests.file import filepath
 
 
 class TestConfigLoading(unittest.TestCase):
-    def setUp(self) -> None:
-        self.fallback_alert_channel = "Default"
-        os.environ["SLACK_ALERT_CHANNEL"] = self.fallback_alert_channel
-
     def test_default_config(self):
 
         config = load_config(filepath("counter.yaml"))
-        self.assertEqual(config.alert_channel, self.fallback_alert_channel)
+        self.assertEqual(config.alert_channel, None)
 
     def test_specified_channel(self):
         config = load_config(filepath("alert-channel.yaml"))
