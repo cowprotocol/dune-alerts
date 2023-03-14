@@ -26,12 +26,12 @@ class QueryRunner:
         self,
         query: QueryBase,
         dune: DuneClient,
-        slack_client: PostClient,
+        alerter: PostClient,
         ping_frequency: int,
     ):
         self.query = query
         self.dune = dune
-        self.slack_client = slack_client
+        self.alerter = alerter
         self.ping_frequency = ping_frequency
 
     def run_loop(self) -> None:
@@ -44,6 +44,6 @@ class QueryRunner:
         alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
             log.warning(alert.message)
-            self.slack_client.post(alert.message)
+            self.alerter.post(alert.message)
         elif alert.level == AlertLevel.LOG:
             log.info(alert.message)
