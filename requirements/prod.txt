@@ -6,3 +6,4 @@ types-PyYAML==6.0.11
 python-dateutil==2.8.2
 python-dotenv==0.21.0
 certifi==2022.12.7
+tweepy==4.13.0

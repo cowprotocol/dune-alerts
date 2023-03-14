@@ -10,8 +10,8 @@ import logging.config
 from dune_client.client import DuneClient
 
 from src.alert import AlertLevel
+from src.post.base import PostClient
 from src.query_monitor.base import QueryBase
-from src.slack_client import BasicSlackClient
 
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
@@ -26,7 +26,7 @@ class QueryRunner:
         self,
         query: QueryBase,
         dune: DuneClient,
-        slack_client: BasicSlackClient,
+        slack_client: PostClient,
         ping_frequency: int,
     ):
         self.query = query

@@ -8,6 +8,7 @@ import dotenv
 
 from dune_client.client import DuneClient
 
+from src.post.base import PostClient
 from src.query_monitor.base import QueryBase
 from src.query_monitor.factory import load_config
 from src.runner import QueryRunner
@@ -17,7 +18,7 @@ from src.slack_client import BasicSlackClient
 def run_slackbot(
     query: QueryBase,
     dune: DuneClient,
-    slack_client: BasicSlackClient,
+    slack_client: PostClient,
     ping_frequency: int,
 ) -> None:
     """
