@@ -99,10 +99,6 @@ class TestFactory(unittest.TestCase):
         self.assertTrue(isinstance(left_bounded_monitor, LeftBoundedQueryMonitor))
         del os.environ["SLACK_ALERT_CHANNEL"]
 
-    def test_load_config_error(self):
-        with self.assertRaises(KeyError):
-            load_config(filepath("no-params.yaml"))
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,11 +10,13 @@ import certifi
 from slack.errors import SlackApiError
 from slack.web.client import WebClient
 
+from src.post.base import PostClient
+
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
 
 
-class BasicSlackClient:
+class BasicSlackClient(PostClient):
     """
     Basic Slack Client with message post functionality
     constructed from an API token and channel

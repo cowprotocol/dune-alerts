@@ -2,13 +2,14 @@
 Factory method to load QueryMonitor object from yaml configuration files
 """
 from __future__ import annotations
-import os
-from dataclasses import dataclass
 
 import logging.config
+from dataclasses import dataclass
+from enum import Enum
+
 import yaml
-from dune_client.types import QueryParameter
 from dune_client.query import Query
+from dune_client.types import QueryParameter
 
 from src.models import TimeWindow, LeftBound
 from src.query_monitor.base import QueryBase
@@ -17,9 +18,20 @@ from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.windowed import WindowedQueryMonitor
 
-
 log = logging.getLogger(__name__)
 logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
+
+
+class AlertType(Enum):
+    """Supported Alert Frameworks."""
+
+    SLACK = "slack"
+    TWITTER = "twitter"
+
+    @classmethod
+    def from_str(cls, val: str) -> AlertType:
+        """From string constructor"""
+        return cls(val.lower())
 
 
 @dataclass
@@ -31,6 +43,7 @@ class Config:
     query: QueryBase
     ping_frequency: int
     alert_channel: str
+    alert_type: AlertType
 
 
 def load_config(config_yaml: str) -> Config:
@@ -66,10 +79,11 @@ def load_config(config_yaml: str) -> Config:
 
     config_obj = Config(
         query=base_query,
-        # Use specified channel, or default to "global config"
-        alert_channel=cfg.get("alert_channel", os.environ["SLACK_ALERT_CHANNEL"]),
+        alert_channel=cfg.get("alert_channel"),
         # This is 4x the DuneClient default of 5 seconds
         ping_frequency=cfg.get("ping_frequency", 20),
+        # Slack is the default alert type.
+        alert_type=AlertType.from_str(cfg.get("alert_type", "slack")),
     )
     log.debug(f"config parsed as {config_obj}")
     return config_obj
