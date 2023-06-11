@@ -43,7 +43,7 @@ class QueryRunner:
         results = self.dune.refresh(query.query, self.ping_frequency)
         alert = query.get_alert(results)
         if alert.level == AlertLevel.SLACK:
-            log.warning(alert.message)
+            log.warning(f"alerting with {alert.message} on result set {results}")
             self.alerter.post(alert.message)
         elif alert.level == AlertLevel.LOG:
             log.info(alert.message)
