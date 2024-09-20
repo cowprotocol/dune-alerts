@@ -67,9 +67,9 @@ class TestTimeWindow(unittest.TestCase):
         self.assertEqual(
             window.as_query_parameters(),
             [
-                QueryParameter.date_type(name="StartTime", value=self.start),
+                QueryParameter.date_type(name="start_time", value=self.start),
                 QueryParameter.date_type(
-                    name="EndTime", value=self.start + timedelta(hours=window.length)
+                    name="end_time", value=self.start + timedelta(hours=window.length)
                 ),
             ],
         )
